@@ -1,4 +1,4 @@
-# Copyright 2019 University of Liège
+# Copyright 2019 University of LiÃ¨ge
 # Main CMake file.
 # Configure the compilation of the C core of the VLM code.
 #
@@ -14,6 +14,10 @@ INCLUDE(VLMMacros)
 ADD_EXECUTABLE(VLM VLM_ADS.c)
 
 # --- Install ---
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    TARGET_LINK_LIBRARIES(VLM m) # Adds -lm option for linking
+endif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+
 SET(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}")
 MESSAGE(STATUS "Installation directory : ${CMAKE_INSTALL_PREFIX}")
 install (TARGETS VLM DESTINATION bin)
