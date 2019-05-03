@@ -4052,10 +4052,10 @@ void calcforcesvtail(struct liftsurf *plift, struct liftsurf *pvtail, struct lif
     }
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
     FILE *ofp, *ifp;
-    char *Infile, Wngfile[20], HTailfile[20], VTailfile[20], *Outfile, line[110], code[7];
+    char *Infile, Wngfile[60], HTailfile[60], VTailfile[60], *Outfile, line[110], code[7];
     struct liftsurf flap,aileron,wing,htail,elevator,vtail,rudder;
     struct liftsurf *pflap = &flap;
     struct liftsurf *paileron = &aileron;
@@ -4069,7 +4069,12 @@ int main(void)
     double delta[2],beta[2],eta[2],zeta[2],deltadegrees,betadegrees,etadegrees,zetadegrees;
     int i,j,mtn,it,ntimes,m,n,freewake,mht,nht,mvt,nvt;
     
-    Infile="infile.arp";
+    if (argc>1) {
+        Infile=argv[1];
+    } else {
+        Infile="infile.arp";
+    }
+    
     Outfile="outfile.m";
 
     printf("Reading parameters from %s\n",Infile);

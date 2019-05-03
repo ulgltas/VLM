@@ -1,0 +1,18 @@
+% Bird wing input file with no yaw and positive flap deflection, negative elevator deflection
+
+% Values of airspeed, air density, angle of attack in degrees, angle of yaw in degrees
+INP1    30  1.225   5.0 0.0
+% Number of chordwise panels for wing, horizontal tail, vertical tail
+INP2    8   4   4
+% Number of spanwise panels for wing, horizontal tail, vertical tail
+INP3    13  8   8
+% Number of time steps, time step denominator, free wake (1 for free, 0 for flat)
+INP4    25  2.0   1
+% Aileron angle in degrees, flap angle in degrees, elevator angle in degrees, rudder angle in degrees
+INP5    0.0   45.0   -15.0   0.0
+% Wing geometry file
+INP6    ./tests/Bird_Wing/Wing-4Sct.arp
+% Horizontal tail geometry file
+INP7    ./tests/Bird_Wing/HTail.arp
+% Vertical tail geometry file
+INP8    ./tests/Bird_Wing/VTail.arp

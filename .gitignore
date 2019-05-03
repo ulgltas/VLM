@@ -1,1 +1,7 @@
 VLM_ADS
+bin*
+build*
+# OS X specific files
+.DS_Store
+# Matlab temporary files
+*~
