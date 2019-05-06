@@ -1,7 +1,7 @@
 # VLM
 This **V**ortex **L**attice **M**ethod code is a 3D unsteady aerodynamics solver.
 # Code compilation procedure
-The code requires CMake and a C compiler. It works both with `gcc` and `clang`.
+The code requires CMake and a C compiler. It works with `gcc`, `msvc` and `clang`.
 
 ## Linux-based systems
 ```bash
@@ -12,6 +12,10 @@ You need both XCode and to have the CMake Command Line Interface. The latter can
 ```bash
 brew install cmake
 ```
+## Windows
+Using Visual Studio 2017, code compiling is straightforward. CMake is included by default.
+Tests can be run from the CMake menu.
+
 ## Compilation
 
 ```bash
