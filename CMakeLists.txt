@@ -11,7 +11,9 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake")
 # macros/fcts
 INCLUDE(VLMMacros)
 
-ADD_EXECUTABLE(VLM VLM_ADS.c)
+# Source subdirectory
+ADD_SUBDIRECTORY( src )
+
 
 # --- Install ---
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
