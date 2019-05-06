@@ -4,91 +4,10 @@
 #include <string.h>
 #include "vAirfoil.h"
 #include "vSpanwisePanels.h"
+#include "vLiftsurf.h"
+#include "vUtilities.h"
+#include "vPanel.h"
 
-struct liftsurf{
-   int    nface; /* number of panels */
-   int    nvert; /* number of vertices */
-   int *faces; /* panel definitions */
-   int *neighbours; /* neighbouring panels to each panel arranged in the order left, right, upstream, downstream */
-   double *vertices; /* panel vertices */
-   int nshed; /* Number of trailing edge panels that shed wake */
-   int *shedding; /* Trailing edge panel that sheds wake (0 or 1) */
-   double *control; /* control point positions */
-   double *vortex; /* Vortex panel vertices */
-   double *tangx; /* Tangential vectors in x direction */
-   double *tangy; /* Tangential vectors in y direction */
-   double *normal; /* Normal vectors */
-   double *nsurf; /* Normal surfaces of panels */
-   double *dxy; /* Vortex segment lengths in x and y directions */
-   double *Deltap; /* Pressure difference across each panel */
-   double *Deltad; /* Induced drag contribution of each panel */
-   double *gamma; /* Vortex strength on each panel */
-   double *wind; /* Induced airspeed on each panel */
-   double *uvw; /* Local airspeed induced by wakes */
-   double *aeroforce; /* Aerodynamic force components in x, y and z directions */
-   int nwakes; /* Number of contiguous wakes shed from the lifting surface */
-   int *wakeinds; /* Indices of panels that shed wake */
-   int *wakelengths; /* Number of wake panels shed at each time step in each wake */
-   int *wakecorrespx; /* Correspondence between bound vortex panels and wake panel vertices */
-   int *wakecorrespy; /* Correspondence between bound vortex panels and wake panel vertices */
-   int *wakecorrespz; /* Correspondence between bound vortex panels and wake panel vertices */
-   int *wakecorrespwake; /* Correspondence between wake panel vertices in different wakes */
-   double *xw; /* x-coordinates of wake vertices */
-   double *yw; /* y-coordinates of wake vertices */
-   double *zw; /* z-coordinates of wake vertices */
-   double *uw; /* velocity in x-direction of wake vertices */
-   double *vw; /* velocity in y-direction of wake vertices */
-   double *ww; /* velocity in z-direction of wake vertices */
-   double *gw; /* Vortex strength on each wake panel */
-};
-
-int compare_function(const void *a,const void *b) {
-    /* Comparison function for use with qsort */
-    double *x = (double *) a;
-    double *y = (double *) b;
-    if (*x < *y) return -1;
-    else if (*x > *y) return 1; return 0;
-}
-
-int checkdoubles(double *ypos, int m)
-{
-    /* Check if double entries exist in vectors */
-    int n,i,j,nj;
-    
-    n=0;
-    for (i=0;i<m;i++){
-        for (j=i+1;j<m;j++){
-            if (fabs(*(ypos+i)- *(ypos+j)) < 0.01){
-                n++;
-            }
-        }
-    }
-    return n;
-}
-
-int finddoubles(double *ypos, int m)
-{
-    /* Find double entries in vectors */
-    /* If there are double entries, they are pushed towards the end of the vector and overwritten */
-    int n,i,j,nj;
-    
-    n=0;
-    for (i=0;i<m;i++){
-        nj=0;
-        for (j=i+1;j<m;j++){
-            if (fabs(*(ypos+i)- *(ypos+j)) < 0.01){
-                nj=j;
-                n++;
-                for (j=nj+1;j<m;j++){
-                    *(ypos+j-1)=*(ypos+j); /* Move all values from double to end of vector one element earlier */
-                }
-                *(ypos+m-1)=-1.0*n; /* Overwrite last element of vector with a non-double value */
-                j--;
-            }
-        }
-    }
-    return m-n;
-}
 
 void adaptycoord(double *ypline, double *ypos, int np1, int nypos)
 {
@@ -107,99 +26,6 @@ void adaptycoord(double *ypline, double *ypos, int np1, int nypos)
             }
         }
         *(ypline+nmin)=*(ypos+i); /* Change the nearest value of ypos */
-    }
-}
-
-int countfaces(int *ijflap, int nflap, int mp1, int np1)
-{
-    /* Count the number of panels in lifting surface
-     * ijflap contains the indices from the complete wing grid that 
-     * lie in the current lifting surface. 
-     * nflap is the number of vertices in the current lifting surface. */
-    int nfaces, i, i1, j1, k, condij[3];
-    
-    nfaces=0; /* number of panels */
-    for (i=0;i<nflap;i++){
-        i1=*(ijflap+i); /* chordwise index */
-        j1=*(ijflap+i+mp1*np1); /* Spanwise index */
-        condij[0]=0;condij[1]=0;condij[2]=0;
-        for (k=i+1;k<nflap;k++){
-            /* Check if we can create a complete rectangle from point i1,j1 */
-            if (*(ijflap+k)==i1+1 && *(ijflap+k+mp1*np1)==j1){
-                condij[0]=k;
-            }
-            if (*(ijflap+k)==i1+1 && *(ijflap+k+mp1*np1)==j1+1){
-                condij[1]=k;
-            }
-            if (*(ijflap+k)==i1 && *(ijflap+k+mp1*np1)==j1+1){
-                condij[2]=k;
-            }
-        }
-        /* If we can create the rectangle, increment nfaces */
-        if (condij[0] != 0 && condij[1] != 0 && condij[2] != 0){
-            nfaces++;
-        }
-    }
-    return nfaces;
-}
-
-void arrangefaces(int *ijflap, int mp1, int np1, struct liftsurf *pflap)
-{
-    /* Create the connections between the vertices of the current lifting surface
-     * that form the panels
-     * pflap is the lifting surface structure
-     * ijflap contains the indices from the complete wing grid that 
-     * lie in the current lifting surface.*/
-    
-    int nfaces, nfaced2, nvertd2, i, i1, j1, k, condij[3],nte;
-    
-    nfaced2=pflap->nface/2;
-    nvertd2=pflap->nvert/2;
-    nfaces=0; /* number of panels */
-    pflap->nshed=0; /* Initialize the number of shedding panels to 0 */
-    for (i=0;i<nvertd2;i++){
-        i1=*(ijflap+i); /* chordwise index */
-        j1=*(ijflap+i+mp1*np1); /* Spanwise index */
-        condij[0]=0;condij[1]=0;condij[2]=0;
-        for (k=i+1;k<nvertd2;k++){
-           /* Check if we can create a complete rectangle from point i1,j1
-            * and store in condij the indices of each panel vertex */
-           if (*(ijflap+k)==i1+1 && *(ijflap+k+mp1*np1)==j1){
-                condij[0]=k;
-            }
-            if (*(ijflap+k)==i1+1 && *(ijflap+k+mp1*np1)==j1+1){
-                condij[1]=k;
-            }
-            if (*(ijflap+k)==i1 && *(ijflap+k+mp1*np1)==j1+1){
-                condij[2]=k;
-            }
-        }
-        /* If we can create the rectangle, increment nfaces 
-         * and store the elements of condij in pflap->faces */
-        if (condij[0] != 0 && condij[1] != 0 && condij[2] != 0){
-            nfaces++;  
-            /* Right lifting surface */
-            *(pflap->faces+nfaces-1)=i;
-            *(pflap->faces+nfaces-1+pflap->nface)=condij[0];
-            *(pflap->faces+nfaces-1+2*pflap->nface)=condij[1];
-            *(pflap->faces+nfaces-1+3*pflap->nface)=condij[2];
-            *(pflap->shedding+nfaces-1)=0;
-            *(pflap->shedding+nfaces-1)=0;
-            /* Left lifting surface */
-            *(pflap->faces+nfaces-1+nfaced2)=i+nvertd2;
-            *(pflap->faces+nfaces-1+nfaced2+pflap->nface)=condij[0]+nvertd2;
-            *(pflap->faces+nfaces-1+nfaced2+2*pflap->nface)=condij[1]+nvertd2;
-            *(pflap->faces+nfaces-1+nfaced2+3*pflap->nface)=condij[2]+nvertd2;
-            *(pflap->shedding+nfaced2+nfaces-1)=0;
-            if (i1 == mp1-2){ /* Check if this a trailing edge panel that sheds wake */
-                /* Right lifting surface */
-                *(pflap->shedding+nfaces-1)=1;
-                pflap->nshed++;
-                /* Left lifting surface */
-                *(pflap->shedding+nfaces-1+nfaced2)=1;
-                pflap->nshed++;
-            }
-        }
     }
 }
 
@@ -374,46 +200,6 @@ void findneighbours(struct liftsurf *pwing, struct liftsurf *pflap, struct lifts
             }
         }
     }
-}
-
-void vortexpanel(double *xv, double *yv, double *zv, double *xp, double *yp, double *zp, double dxw, int m, int n)
-{
-    /* Calculate the collocation points and vector rings on a panel surface xp,yp,zp */
-    int i,j,mp1,np1;
-    double angp1;
-    
-    mp1=m+1;
-    np1=n+1;
-    /* Calculate vortex positions */
-    for (j=0;j<np1;j++){
-        for (i=0;i<m;i++){
-            *(xv+i+j*mp1)=3.0* *(xp+i+j*mp1)/4.0+ *(xp+(i+1)+j*mp1)/4.0;
-            *(yv+i+j*mp1)= *(yp+i+j*mp1);
-            *(zv+i+j*mp1)=3.0* *(zp+i+j*mp1)/4.0+ *(zp+(i+1)+j*mp1)/4.0;
-        }
-        /* Trailing edge vortex panels */
-        angp1=atan2(*(zp+m+j*mp1)- *(zp+(m-1)+j*mp1),*(xp+m+j*mp1)- *(xp+(m-1)+j*mp1));
-        *(xv+m+j*mp1)= *(xp+m+j*mp1)+dxw* cos(angp1);
-        *(yv+m+j*mp1)= *(yp+m+j*mp1);
-        *(zv+m+j*mp1)= *(zp+m+j*mp1)+dxw* sin(angp1);
-    }
-}
-
-int findindex(double *ypline, int np1, double value)
-{
-    /* Find the index of the element of a vector that is closest to a number */ 
-    int i,index;
-    double dist,mindist;
-    
-    mindist=10000.0;
-    for (i=0;i<np1;i++){
-        dist=fabs(value-*(ypline+i));
-        if (dist < mindist){
-            mindist=dist;
-            index=i;
-        }
-    }
-    return index;
 }
 
 void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfile, int m, int n)

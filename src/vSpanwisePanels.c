@@ -8,6 +8,7 @@
 
 #include "vSpanwisePanels.h"
 #include <stdlib.h>
+#include "math.h"
 
 void createypline(double *ypos,int nypos,double *ypline,int np1)
 {
