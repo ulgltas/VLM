@@ -4,7 +4,7 @@
 #
 # Authors : M. SANCHEZ MARTINEZ.
 
-ADD_LIBRARY(VLMCore STATIC vAirfoil.h vAirfoil.c vSpanwisePanels.h vSpanwisePanels.c vUtilities.h vUtilities.c vLiftsurf.h vPanel.h vPanel.c vVertices.h vVertices.c)
+ADD_LIBRARY(VLMCore STATIC vAirfoil.h vAirfoil.c vSpanwisePanels.h vSpanwisePanels.c vUtilities.h vUtilities.c vLiftsurf.h vPanel.h vPanel.c vVertices.h vVertices.c vVTail.h vVTail.c vHTail.h vHTail.c vWing.h vWing.c)
 
 ADD_EXECUTABLE(VLM VLM_ADS.c)
 
