@@ -3110,13 +3110,13 @@ void createwake(struct liftsurf *pwing, double cwing,int ntimes)
         storewakeinds(pwing);
     }
     setupwakes(pwing,cwing);
-    pwing->xw=(double *)malloc(sizeof(double)*(pwing->nshed+pwing->nwakes)*ntimes);
-    pwing->yw=(double *)malloc(sizeof(double)*(pwing->nshed+pwing->nwakes)*ntimes);
-    pwing->zw=(double *)malloc(sizeof(double)*(pwing->nshed+pwing->nwakes)*ntimes);
-    pwing->uw=(double *)malloc(sizeof(double)*(pwing->nshed+pwing->nwakes)*ntimes);
-    pwing->vw=(double *)malloc(sizeof(double)*(pwing->nshed+pwing->nwakes)*ntimes);
-    pwing->ww=(double *)malloc(sizeof(double)*(pwing->nshed+pwing->nwakes)*ntimes);
-    pwing->gw=(double *)malloc(sizeof(double)*pwing->nshed*ntimes);
+    pwing->xw=(double *)calloc((pwing->nshed + pwing->nwakes)*ntimes, sizeof(double));
+    pwing->yw=(double *)calloc((pwing->nshed + pwing->nwakes)*ntimes, sizeof(double));
+    pwing->zw=(double *)calloc((pwing->nshed + pwing->nwakes)*ntimes, sizeof(double));
+    pwing->uw=(double *)calloc((pwing->nshed + pwing->nwakes)*ntimes, sizeof(double));
+    pwing->vw=(double *)calloc((pwing->nshed + pwing->nwakes)*ntimes, sizeof(double));
+    pwing->ww=(double *)calloc((pwing->nshed + pwing->nwakes)*ntimes, sizeof(double));
+    pwing->gw=(double *)calloc(pwing->nshed * ntimes, sizeof(double));
     /* Set contents of pwing->xw,yw,zw to zero */
     for (i=0;i<(pwing->nshed+pwing->nwakes)*ntimes;i++){
         *(pwing->xw+i)=0.0;
@@ -4122,7 +4122,7 @@ int main(int argc, char *argv[])
     
     fclose(ifp);    
         
-    totalforce=(double *)malloc(sizeof(double)*ntimes*4);
+    totalforce=(double *)calloc(ntimes*4, sizeof(double));
     pi=atan(1.0)*4.0;
     aoa=aoadegrees*pi/180.0;
     yaw=yawdegrees*pi/180.0;
@@ -4222,9 +4222,9 @@ int main(int argc, char *argv[])
     mtn=flap.nface+wing.nface+aileron.nface+htail.nface+elevator.nface+vtail.nface+rudder.nface;
     
     /* Assign memory for global matrices */
-    AN=(double *)malloc(sizeof(double)*mtn*mtn); /* Normal flow coefficient matrix */
+    AN=(double *)calloc(mtn*mtn, sizeof(double)); /* Normal flow coefficient matrix */
     invAN=(double *)malloc(sizeof(double)*mtn*mtn); /* Inverse of normal flow coefficient matrix */
-    BN=(double *)malloc(sizeof(double)*mtn*mtn); /* Downwash coefficient matrix */
+    BN=(double *)calloc(mtn*mtn, sizeof(double)); /* Downwash coefficient matrix */
     RHS=(double *)malloc(sizeof(double)*mtn); /* Right Hand Side vector */
     Gammas = (double *)malloc(sizeof(double)*mtn); /* Vorticity vector history */
     wind=(double *)malloc(sizeof(double)*mtn); /* Induced windspeeds */
@@ -4236,29 +4236,29 @@ int main(int argc, char *argv[])
     gauss(AN,invAN,mtn);
 
     /* Assign memory for gamma and wind values in every liftsurf */
-    pwing->gamma=(double *)malloc(sizeof(double)*pwing->nface*ntimes);
-    pwing->wind=(double *)malloc(sizeof(double)*pwing->nface);
-    pflap->gamma=(double *)malloc(sizeof(double)*pflap->nface*ntimes);
-    pflap->wind=(double *)malloc(sizeof(double)*pflap->nface);
-    paileron->gamma=(double *)malloc(sizeof(double)*paileron->nface*ntimes);
-    paileron->wind=(double *)malloc(sizeof(double)*paileron->nface);
-    phtail->gamma=(double *)malloc(sizeof(double)*phtail->nface*ntimes);
-    phtail->wind=(double *)malloc(sizeof(double)*phtail->nface);
-    pelevator->gamma=(double *)malloc(sizeof(double)*pelevator->nface*ntimes);
-    pelevator->wind=(double *)malloc(sizeof(double)*pelevator->nface);
-    pvtail->gamma=(double *)malloc(sizeof(double)*pvtail->nface*ntimes);
-    pvtail->wind=(double *)malloc(sizeof(double)*pvtail->nface);
-    prudder->gamma=(double *)malloc(sizeof(double)*prudder->nface*ntimes);
-    prudder->wind=(double *)malloc(sizeof(double)*prudder->nface);
+    pwing->gamma=(double *)calloc(pwing->nface*ntimes, sizeof(double));
+    pwing->wind=(double *)calloc(pwing->nface, sizeof(double));
+    pflap->gamma=(double *)calloc(pflap->nface*ntimes, sizeof(double));
+    pflap->wind=(double *)calloc(pflap->nface, sizeof(double));
+    paileron->gamma=(double *)calloc(paileron->nface*ntimes, sizeof(double));
+    paileron->wind=(double *)calloc(paileron->nface, sizeof(double));
+    phtail->gamma=(double *)calloc(phtail->nface*ntimes, sizeof(double));
+    phtail->wind=(double *)calloc(phtail->nface, sizeof(double));
+    pelevator->gamma=(double *)calloc(pelevator->nface*ntimes, sizeof(double));
+    pelevator->wind=(double *)calloc(pelevator->nface, sizeof(double));
+    pvtail->gamma=(double *)calloc(pvtail->nface*ntimes, sizeof(double));
+    pvtail->wind=(double *)calloc(pvtail->nface, sizeof(double));
+    prudder->gamma=(double *)calloc(prudder->nface*ntimes, sizeof(double));
+    prudder->wind=(double *)calloc(prudder->nface, sizeof(double));
     
-    /* Assign memory for uvw values in every liftsurf */
-    pwing->uvw=(double *)malloc(sizeof(double)*pwing->nface*3);
-    pflap->uvw=(double *)malloc(sizeof(double)*pflap->nface*3);
-    paileron->uvw=(double *)malloc(sizeof(double)*paileron->nface*3);
-    phtail->uvw=(double *)malloc(sizeof(double)*phtail->nface*3);
-    pelevator->uvw=(double *)malloc(sizeof(double)*pelevator->nface*3);
-    pvtail->uvw=(double *)malloc(sizeof(double)*pvtail->nface*3);
-    prudder->uvw=(double *)malloc(sizeof(double)*prudder->nface*3);
+    /* Assign memory AND INITIALISE uvw values in every liftsurf */
+    pwing->uvw=(double *)calloc(pwing->nface * 3, sizeof(double));
+    pflap->uvw=(double *)calloc(pflap->nface * 3, sizeof(double));
+    paileron->uvw=(double *)calloc(paileron->nface * 3, sizeof(double));
+    phtail->uvw = (double *)calloc(phtail->nface * 3, sizeof(double));
+    pelevator->uvw=(double *)calloc(pelevator->nface * 3, sizeof(double));
+    pvtail->uvw = (double *)calloc(pvtail->nface * 3, sizeof(double));
+    prudder->uvw=(double *)calloc(prudder->nface * 3, sizeof(double));
     
     /* Assign memory for Deltap, Deltad and aeroforce on every liftsurf */
     pwing->Deltap=(double *)malloc(sizeof(double)*pwing->nface);
