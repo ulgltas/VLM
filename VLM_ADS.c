@@ -475,7 +475,7 @@ void readarfsize(char *WngArf,int ArfXUNumber[],int ArfXLNumber[])
     /* Read size of data in airfoil file */
     FILE *fp2;
     int cond,npoint;
-    char line[110],code[7];
+    char line[110],code[8];
     char* arfname=malloc(strlen(WngArf) + strlen(".arf") + 2);
     
     /* Append .arf at the end of the airfoil name to obtain the filename */
@@ -512,7 +512,7 @@ void readarf(char *WngArf,double *ArfXU, double *ArfYU, double *ArfXL,double *Ar
     /* Read airfoil file data */
     FILE *fp2;
     int cond,npoint;
-    char line[110],code[7];
+    char line[110],code[8];
     char* arfname=malloc(strlen(WngArf) + strlen(".arf") + 2);
     
     /* Append .arf at the end of the airfoil name to obtain the filename */
@@ -663,7 +663,7 @@ void treatarfwgl(char line[], double *xpline, double *ycamber, int mp1)
     /* Carries out the treatment of the airfoil on the winglet */
     int ArfXUNumber[1],ArfXLNumber[1],j;
     double *ArfXU, *ArfYU, *ArfXL, *ArfYL;
-    char code[7], *WglArf, *nacanumber;
+    char code[8], *WglArf, *nacanumber;
     char *token = NULL;
                
     token = strtok(line, "\t,\n");
@@ -693,7 +693,7 @@ void treatarf(char line[], double *xpline, double *ycamber, double *ycamberall, 
     /* Carries out the treatment of the airfoils on each end of each trapezoidal section */
     int ArfXUNumber[1],ArfXLNumber[1],j;
     double *ArfXU, *ArfYU, *ArfXL, *ArfYL;
-    char code[7], *WngTSRtArf, *WngTSTpArf, *nacanumber;
+    char code[8], *WngTSRtArf, *WngTSTpArf, *nacanumber;
     char *token = NULL;
                
     token = strtok(line, "\t,\n");
@@ -810,7 +810,7 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     FILE *fp1;
     int iTS, VTTSNumber, cond, ChkRdr, npTS, npTSp1, ndouble;
     int RDRinds[2][2],dummyint,OptVTFusMounted,OptVTTailMounted,OptVTWingMounted;
-    char line[110], code[7], VTType[12], VTArf[12], VTSurfFinish[12], nindex[12];
+    char line[110], code[8], VTType[12], VTArf[12], VTSurfFinish[12], nindex[12];
     double VTTSLength[2], VTTSRtChord[2], VTTSTpChord[2];
     double VTTSSwpLE[2], VTTSDhdr[2], VTTSTR[2];
     double VTSpan, VTLPosFus, VTVPosFus, VTRtChord, VTTpChord, VTSPosFus, VTArea, VTTankVol, VTSwpLE, VTVAngle;
@@ -1192,7 +1192,7 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     FILE *fp1;
     int iTS, HTTSNumber, cond, ChkElev, npTS, npTSp1, ndouble;
     int ELVinds[2][2],dummyint;
-    char line[110], code[7], HTType[12], HTArf[12], HTSurfFinish[12], nindex[12];
+    char line[110], code[8], HTType[12], HTArf[12], HTSurfFinish[12], nindex[12];
     double HTTSLength[3], HTTSRtChord[3], HTTSTpChord[3];
     double HTTSLPosFus[3], HTTSSPosFus[3], HTTSVPosFus[3], HTTSSwpMxRlThick[3];
     double HTTSRtInc[3], HTTSTpInc[3], HTTSSwpLE[3], HTTSDhdr[3], HTTSTwist[3], HTTSTR[3];
@@ -1605,7 +1605,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     FILE *fp1;
     int iTS, lstWngTSNumber, cond, ChkAil, ChkWLED, ChkWTED, ChkWGL, WTEDStopPointsNumber, npTS, npTSp1, ndouble;
     int Ailinds[2][2],WTEDinds[2][2],Wglinds[2][2];
-    char line[110], code[7], WngArf[12], nindex[12];
+    char line[110], code[8], WngArf[12], nindex[12];
     double WngTSLength[4], WngTSRtChord[4], WngTSTpChord[4], WngTSLPosFus[4], WngTSSPosFus[4], WngTSVPosFus[4];
     double WngTSRtInc[4], WngTSTpInc[4], WngTSSwpLE[4], WngTSDhdr[4], WngTSTwist[4], WngTSTR[4], WngTSRtIncZLA[4], WngTSTpIncZLA[4];
     double WngTSSwp25Prct[4], WngTSSwp50Prct[4];
@@ -4055,7 +4055,7 @@ void calcforcesvtail(struct liftsurf *plift, struct liftsurf *pvtail, struct lif
 int main(int argc, char *argv[])
 {
     FILE *ofp, *ifp;
-    char *Infile, Wngfile[60], HTailfile[60], VTailfile[60], *Outfile, line[110], code[7];
+    char *Infile, Wngfile[60], HTailfile[60], VTailfile[60], *Outfile, line[110], code[8];
     struct liftsurf flap,aileron,wing,htail,elevator,vtail,rudder;
     struct liftsurf *pflap = &flap;
     struct liftsurf *paileron = &aileron;
