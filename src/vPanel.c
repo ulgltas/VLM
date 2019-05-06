@@ -7,7 +7,7 @@
 //
 
 #include "vPanel.h"
-#include "math.h"
+#include <math.h>
 #include "vLiftsurf.h"
 
 int countfaces(int *ijflap, int nflap, int mp1, int np1)

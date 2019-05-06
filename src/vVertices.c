@@ -7,6 +7,7 @@
 
 #include "vVertices.h"
 #include "vLiftsurf.h"
+#include <stdlib.h>
 
 void assignvertices(struct liftsurf *pflap, double *xflap, double *yflap, double *zflap, double *xvflap, double *yvflap, double *zvflap)
 {
