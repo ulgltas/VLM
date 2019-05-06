@@ -25,9 +25,6 @@ ADD_SUBDIRECTORY( src )
 
 
 # --- Install ---
-if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    TARGET_LINK_LIBRARIES(VLM m) # Adds -lm option for linking
-endif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 
 if(CMAKE_BUILD_TYPE MATCHES DEBUG )
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
