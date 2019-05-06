@@ -6,6 +6,7 @@
 //
 
 #include "vGeometry.h"
+#include "vLiftsurf.h"
 #include <stdlib.h>
 #include <math.h>
 
