@@ -9,3 +9,5 @@ ADD_LIBRARY(VLMCore STATIC vAirfoil.h vAirfoil.c vSpanwisePanels.h vSpanwisePane
 ADD_EXECUTABLE(VLM VLM_ADS.c)
 
 TARGET_LINK_LIBRARIES(VLM VLMCore)
+
+install (TARGETS VLM DESTINATION "${PROJECT_SOURCE_DIR}/bin")
