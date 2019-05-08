@@ -231,66 +231,6 @@ void shedwake(struct liftsurf *pwing)
     }
 }
 
-void calcdistwake(struct liftsurf *pwing, struct liftsurf *pflap, int i, int cflap)
-{
-    /* Calculate the distance between vertex i in the first shed element of the wake in pwing and
-     all the vertices in the first shed element of the wake in pflap */
-    
-    int j;
-    double distx,disty,distz,dist;
-    
-    for (j=0;j<pflap->nshed+pflap->nwakes;j++){
-        distx=(*(pwing->xw+i)-*(pflap->xw+j));
-        disty=(*(pwing->yw+i)-*(pflap->yw+j));
-        distz=(*(pwing->zw+i)-*(pflap->zw+j));
-        dist=distx*distx+disty*disty+distz*distz;
-        if (dist < 0.0000001){
-            *(pwing->wakecorrespwake+i)=j+cflap;
-            if (dist > 0){
-                *(pflap->xw+j)=*(pwing->xw+i);
-                *(pflap->yw+j)=*(pwing->yw+i);
-                *(pflap->zw+j)=*(pwing->zw+i);
-            }
-        }
-    }
-}
-
-void findallwakeneighbours(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, int cwing, int cflap, int caileron)
-{
-    /* Check first shed wake element to see if the different lifsurfs have coincident points */
-    int i,j;
-    double dist;
-    
-    pwing->wakecorrespwake=(int *)malloc(sizeof(int)*(pwing->nshed+pwing->nwakes));
-    pflap->wakecorrespwake=(int *)malloc(sizeof(int)*(pflap->nshed+pflap->nwakes));
-    paileron->wakecorrespwake=(int *)malloc(sizeof(int)*(paileron->nshed+paileron->nwakes));
-    
-    /* Wing */
-    for (i=0;i<pwing->nshed+pwing->nwakes;i++){
-        *(pwing->wakecorrespwake+i)=-1;
-        /* Flap */
-        calcdistwake(pwing,pflap,i,cflap);
-        /* Aileron */
-        calcdistwake(pwing,paileron,i,caileron);
-    }
-    /* Flap */
-    for (i=0;i<pflap->nshed+pflap->nwakes;i++){
-        *(pflap->wakecorrespwake+i)=-1;
-        /* Wing */
-        calcdistwake(pflap,pwing,i,cwing);
-        /* Aileron */
-        calcdistwake(pflap,paileron,i,caileron);
-    }  
-    /* Aileron */
-    for (i=0;i<paileron->nshed+paileron->nwakes;i++){
-        *(paileron->wakecorrespwake+i)=-1;
-        /* Wing */
-        calcdistwake(paileron,pwing,i,cwing);
-        /* Flap */
-        calcdistwake(paileron,pflap,i,cflap);
-    }      
-}
-
 void wakegamma(struct liftsurf *pwing, int it)
 {
     /* Assign vortex strength to first row of wake panels */

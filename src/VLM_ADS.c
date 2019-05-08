@@ -10,6 +10,7 @@
 #include "vGeometry.h"
 #include "vInfluence.h"
 #include "vLiftsurf.h"
+#include "vNeighbours.h"
 #include "vRHS.h"
 #include "vVortex.h"
 #include "vWake.h"
@@ -35,121 +36,6 @@ void adaptycoord(double *ypline, double *ypos, int np1, int nypos)
             }
         }
         *(ypline+nmin)=*(ypos+i); /* Change the nearest value of ypos */
-    }
-}
-
-void findneighbours(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, int cwing, int cflap, int caileron)
-{
-    /* Find all the neighbours of all the wing panels in all wing, flap and aileron panels */
-    int i,j,k,l,repeat[4];
-    double vertx[4],verty[4],vertz[4],dist[3],totaldist;
-    
-    pwing->neighbours=(int *)malloc(sizeof(int)*pwing->nface*4);
-    for (i=0;i<pwing->nface;i++){
-        for (k=0;k<4;k++){
-            vertx[k]=*(pwing->vertices+ *(pwing->faces+i+k*pwing->nface));
-            verty[k]=*(pwing->vertices+pwing->nvert+ *(pwing->faces+i+k*pwing->nface));
-            vertz[k]=*(pwing->vertices+2*pwing->nvert+ *(pwing->faces+i+k*pwing->nface));
-            *(pwing->neighbours+i+k*pwing->nface)=-1;
-        }
-        /* Check if wing panels have neighbours on the wing */
-        for (j=0;j<pwing->nface;j++){
-            if (i != j){
-                for (k=0;k<4;k++){
-                    repeat[k]=0;
-                    for (l=0;l<4;l++){
-                        dist[0]=vertx[k]-*(pwing->vertices+ *(pwing->faces+j+l*pwing->nface));
-                        dist[1]=verty[k]-*(pwing->vertices+pwing->nvert+ *(pwing->faces+j+l*pwing->nface));
-                        dist[2]=vertz[k]-*(pwing->vertices+2*pwing->nvert+ *(pwing->faces+j+l*pwing->nface));
-                        totaldist=sqrt(dist[0]*dist[0]+dist[1]*dist[1]+dist[2]*dist[2]);
-                        if (totaldist < 0.001)
-                            repeat[k]=j+1; /* +1 so that j=0 does not results in repeat[k]=0 */
-                    }
-                }
-                if (repeat[0] != 0 && repeat[1] !=0){
-                    if (i<pwing->nface/2){
-                        *(pwing->neighbours+i+pwing->nface)=cwing+j; /* right neighbour looking from leading edge to trailing edge*/
-                    }else
-                        *(pwing->neighbours+i)=cwing+j; /* left neighbour looking from leading edge to trailing edge*/
-                }
-                if (repeat[1] != 0 && repeat[2] !=0){
-                    *(pwing->neighbours+i+3*pwing->nface)=cwing+j; /* downstream neighbour looking from leading edge to trailing edge*/
-                }
-                if (repeat[2] != 0 && repeat[3] !=0){
-                    if (i<pwing->nface/2){
-                        *(pwing->neighbours+i)=cwing+j; /* left neighbour looking from leading edge to trailing edge*/
-                    }else
-                        *(pwing->neighbours+i+pwing->nface)=cwing+j; /* right neighbour looking from leading edge to trailing edge*/
-                }
-                if (repeat[3] != 0 && repeat[0] !=0){
-                    *(pwing->neighbours+i+2*pwing->nface)=cwing+j; /* upstream neighbour looking from leading edge to trailing edge*/
-                }
-            }
-        }
-        /* Now check if wing panels have neighbours on the flap */
-        for (j=0;j<pflap->nface;j++){
-            for (k=0;k<4;k++){
-                repeat[k]=0;
-                for (l=0;l<4;l++){
-                    dist[0]=vertx[k]-*(pflap->vertices+ *(pflap->faces+j+l*pflap->nface));
-                    dist[1]=verty[k]-*(pflap->vertices+pflap->nvert+ *(pflap->faces+j+l*pflap->nface));
-                    dist[2]=vertz[k]-*(pflap->vertices+2*pflap->nvert+ *(pflap->faces+j+l*pflap->nface));
-                    totaldist=sqrt(dist[0]*dist[0]+dist[1]*dist[1]+dist[2]*dist[2]);
-                    if (totaldist < 0.001)
-                        repeat[k]=j+1; /* +1 so that j=0 does not result in repeat[k]=0 */
-                }
-            }
-            if (repeat[0] != 0 && repeat[1] !=0){
-                if (i<pwing->nface/2){
-                    *(pwing->neighbours+i+pwing->nface)=cflap+j; /* right neighbour looking from leading edge to trailing edge*/
-                }else
-                    *(pwing->neighbours+i)=cflap+j; /* left neighbour looking from leading edge to trailing edge*/
-            }
-            if (repeat[1] != 0 && repeat[2] !=0){
-                *(pwing->neighbours+i+3*pwing->nface)=cflap+j; /* downstream neighbour looking from leading edge to trailing edge*/
-            }
-            if (repeat[2] != 0 && repeat[3] !=0){
-                if (i<pwing->nface/2){
-                    *(pwing->neighbours+i)=cflap+j; /* left neighbour looking from leading edge to trailing edge*/
-                }else
-                    *(pwing->neighbours+i+pwing->nface)=cflap+j; /* right neighbour looking from leading edge to trailing edge*/
-            }
-            if (repeat[3] != 0 && repeat[0] !=0){
-                *(pwing->neighbours+i+2*pwing->nface)=cflap+j; /* upstream neighbour looking from leading edge to trailing edge*/
-            }
-        }
-        /* Now check if wing panels have neighbours on the aileron */
-        for (j=0;j<paileron->nface;j++){
-            for (k=0;k<4;k++){
-                repeat[k]=0;
-                for (l=0;l<4;l++){
-                    dist[0]=vertx[k]-*(paileron->vertices+ *(paileron->faces+j+l*paileron->nface));
-                    dist[1]=verty[k]-*(paileron->vertices+paileron->nvert+ *(paileron->faces+j+l*paileron->nface));
-                    dist[2]=vertz[k]-*(paileron->vertices+2*paileron->nvert+ *(paileron->faces+j+l*paileron->nface));
-                    totaldist=sqrt(dist[0]*dist[0]+dist[1]*dist[1]+dist[2]*dist[2]);
-                    if (totaldist < 0.001)
-                        repeat[k]=j+1; /* +1 so that j=0 does not results in repeat[k]=0 */
-                }
-            }
-            if (repeat[0] != 0 && repeat[1] !=0){
-                if (i<pwing->nface/2){
-                    *(pwing->neighbours+i+pwing->nface)=caileron+j; /* right neighbour looking from leading edge to trailing edge*/
-                }else
-                    *(pwing->neighbours+i)=caileron+j; /* left neighbour looking from leading edge to trailing edge*/
-            }
-            if (repeat[1] != 0 && repeat[2] !=0){
-                *(pwing->neighbours+i+3*pwing->nface)=caileron+j; /* downstream neighbour looking from leading edge to trailing edge*/
-            }
-            if (repeat[2] != 0 && repeat[3] !=0){
-                if (i<pwing->nface/2){
-                    *(pwing->neighbours+i)=caileron+j; /* left neighbour looking from leading edge to trailing edge*/
-                }else
-                    *(pwing->neighbours+i+pwing->nface)=caileron+j; /* right neighbour looking from leading edge to trailing edge*/
-            }
-            if (repeat[3] != 0 && repeat[0] !=0){
-                *(pwing->neighbours+i+2*pwing->nface)=caileron+j; /* upstream neighbour looking from leading edge to trailing edge*/
-            }
-        }
     }
 }
 

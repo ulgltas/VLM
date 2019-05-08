@@ -22,10 +22,6 @@ void correspshedwake(struct liftsurf *pwing);
 
 void shedwake(struct liftsurf *pwing);
 
-void calcdistwake(struct liftsurf *pwing, struct liftsurf *pflap, int i, int cflap);
-
-void findallwakeneighbours(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, int cwing, int cflap, int caileron);
-
 void wakegamma(struct liftsurf *pwing, int it);
 
 void propwakexyz(struct liftsurf *pwing, double dt, int it, double UVW[]);
