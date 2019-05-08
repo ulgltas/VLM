@@ -4,7 +4,9 @@
 #
 # Authors : M. SANCHEZ MARTINEZ.
 
-ADD_LIBRARY(VLMCore STATIC vAirfoil.h vAirfoil.c vSpanwisePanels.h vSpanwisePanels.c vUtilities.h vUtilities.c vLiftsurf.h vPanel.h vPanel.c vVertices.h vVertices.c vVTail.h vVTail.c vHTail.h vHTail.c vWing.h vWing.c vGeometry.h vGeometry.c vVortex.h vVortex.c vWake.h vWake.c vInput.h vInput.c vOutput.h vOutput.c vForce.h vForce.c vInfluence.h vInfluence.c)
+FILE(GLOB SRCS *.h v*.c) # Stores these files in variable SRCS
+
+ADD_LIBRARY(VLMCore STATIC ${SRCS})
 
 ADD_EXECUTABLE(VLM VLM_ADS.c)
 
