@@ -1,6 +1,7 @@
 VLM_ADS
 bin*
 build*
+workspace*
 # OS X specific files
 .DS_Store
 # Matlab temporary files
