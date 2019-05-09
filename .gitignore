@@ -5,3 +5,5 @@ build*
 .DS_Store
 # Matlab temporary files
 *~
+# VS Code folder
+.vscode
