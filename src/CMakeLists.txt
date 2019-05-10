@@ -7,6 +7,7 @@
 FILE(GLOB SRCS *.h v*.c) # Stores these files in variable SRCS
 FILE(GLOB SWIGSRCS *.i)
 
+
 ADD_LIBRARY(VLMCore STATIC ${SRCS})
 
 ADD_EXECUTABLE(VLM VLM_ADS.c)
@@ -23,8 +24,8 @@ IF(${CMAKE_VERSION} VERSION_LESS "3.8.0" AND PYTHON_WRAPPER)
 ELSEIF(PYTHON_WRAPPER)
   SWIG_ADD_LIBRARY(PyVLM
                    LANGUAGE python
-                   SOURCES ${SWIGSRCS} ${SRCS}
-                   OUTPUT_DIR "${PROJECT_SOURCE_DIR}/bin")
+                   OUTPUT_DIR "${PROJECT_SOURCE_DIR}/bin"
+                   SOURCES ${SWIGSRCS} ${SRCS})
   SWIG_LINK_LIBRARIES(PyVLM ${PYTHON_LIBRARIES})
   set(TARGS ${TARGS} _PyVLM)
 ENDIF()
