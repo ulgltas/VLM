@@ -524,31 +524,47 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
             winghere=0;
             aileronhere=0;
             /* Check if this point lies on the flap */
-            if (i >= WTEDinds[0][0] && i <= WTEDinds[1][0] && j >= WTEDinds[0][1] && j <= WTEDinds[1][1]){ /* Flap */
-                flaphere=1;
-                if (i == WTEDinds[0][0]){ /* Flap leading edge */
-                    winghere=1;
-                }
-                if (j == WTEDinds[0][1]){ /* Flap inboard edge */
-                    winghere=1;
-                }
-                if (j == WTEDinds[1][1]){ /* Flap outboard edge */
-                    winghere=1;
+            if (ChkWTED == 1)
+            {
+                if (i >= WTEDinds[0][0] && i <= WTEDinds[1][0] && j >= WTEDinds[0][1] && j <= WTEDinds[1][1])
+                { /* Flap */
+                    flaphere = 1;
+                    if (i == WTEDinds[0][0])
+                    { /* Flap leading edge */
+                        winghere = 1;
+                    }
+                    if (j == WTEDinds[0][1])
+                    { /* Flap inboard edge */
+                        winghere = 1;
+                    }
+                    if (j == WTEDinds[1][1])
+                    { /* Flap outboard edge */
+                        winghere = 1;
+                    }
                 }
             }
+
             /* Check if this point lies on the aileron */
-            if (i >= Ailinds[0][0] && i <= Ailinds[1][0] && j >= Ailinds[0][1] && j <= Ailinds[1][1]){ /* Aileron */
-                aileronhere=1;
-                if (i == Ailinds[0][0]){ /* Aileron leading edge */
-                    winghere=1;
-                }
-                if (j == Ailinds[0][1]){ /* Aileron inboard edge */
-                    winghere=1;
-                }
-                if (j == Ailinds[1][1]){ /* Aileron outboard edge */
-                    winghere=1;
+            if (ChkAil == 1)
+            {
+                if (i >= Ailinds[0][0] && i <= Ailinds[1][0] && j >= Ailinds[0][1] && j <= Ailinds[1][1])
+                { /* Aileron */
+                    aileronhere = 1;
+                    if (i == Ailinds[0][0])
+                    { /* Aileron leading edge */
+                        winghere = 1;
+                    }
+                    if (j == Ailinds[0][1])
+                    { /* Aileron inboard edge */
+                        winghere = 1;
+                    }
+                    if (j == Ailinds[1][1])
+                    { /* Aileron outboard edge */
+                        winghere = 1;
+                    }
                 }
             }
+
             /* Check if this point lies on the wiglet */
             if (  ChkWGL == 1){
                 if (i >= Wglinds[0][0] && i <= Wglinds[1][0] && j >= Wglinds[0][1] && j <= Wglinds[1][1]){ /* Aileron */
