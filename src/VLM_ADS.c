@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
     double UVW[3],aoa,yaw,dt,timestep_denom,MAC,rho,*totalforce;
     double delta[2],beta[2],eta[2],zeta[2];
     int i,j,mtn,it,ntimes,m,n,freewake,mht,nht,mvt,nvt;
+    int ChkAil, ChkWTED;
     
     if (argc>1) {
         Infile=argv[1];
@@ -51,7 +52,7 @@ int main(int argc, char *argv[])
     totalforce=(double *)calloc(ntimes*4, sizeof(double));
     
     /* Create the lifting surfaces that make up the wing */
-    MAC=wingsetup(pflap,paileron,pwing,Wngfile,m,n);
+    MAC=wingsetup(pflap,paileron,pwing,Wngfile,m,n, &ChkAil, &ChkWTED);
     /* Create the lifting surfaces that make up the horizontal tail */
     htailsetup(phtail,pelevator,HTailfile,mht,nht);
     /* Create the lifting surfaces that make up the vertical tail */
@@ -60,9 +61,17 @@ int main(int argc, char *argv[])
     printf("MAC=%f, dt=%f\n",MAC,dt);
     
     /* Rotate ailerons */
-    rotateail(paileron,delta);
+    if (ChkAil == 1)
+    {
+        rotateail(paileron, delta);
+    }
+    
     /* Rotate flaps */
-    rotateail(pflap,beta);
+    if (ChkWTED == 1)
+    {
+        rotateail(pflap, beta);
+    }
+    
     /* Rotate elevator */
     rotateail(pelevator,eta);
     /* Rotate rudder */
