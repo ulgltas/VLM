@@ -10,6 +10,6 @@
 
 #include "vLiftsurf.h"
 
-double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *pwing, char *Wngfile, int m, int n);
+double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *pwing, char *Wngfile, int m, int n, int *ChkAil, int *ChkWTED);
 
 #endif /* vWing_h */
