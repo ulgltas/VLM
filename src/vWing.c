@@ -336,7 +336,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
         WglLeOffset=0.01;
         WglSwpLE=WglSwpLE*pi/180.0;
         WglDhdrl=WglDhdrl*pi/180.0;
-        nypos++;
+        nypos+=3; // Three panels in the winglet
         nxpos=6;
         nxyzTS=lstWngTSNumber+2;
         WglTpr=WglTpChord/WglRtChord; /* Winglet taper ratio */
