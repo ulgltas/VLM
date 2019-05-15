@@ -8,3 +8,7 @@ workspace*
 *~
 # VS Code folder
 .vscode
+# Visual Studio folder
+.vs
+# Python compiled files
+*.pyc
