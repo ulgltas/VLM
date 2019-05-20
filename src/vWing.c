@@ -321,15 +321,17 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
         }
     }
     nypos=lstWngTSNumber+1;
-    nxpos=4;
+    nxpos=2;
     nxyzTS=lstWngTSNumber+1;
     if (*ChkAil == 1)
     {
         nypos++;
+        nxpos++;
     }
     if (*ChkWTED == 1)
     {
         nypos++;
+        nxpos++;
     }
 
     if (  ChkWGL == 1){
@@ -337,7 +339,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
         WglSwpLE=WglSwpLE*pi/180.0;
         WglDhdrl=WglDhdrl*pi/180.0;
         nypos+=3; // Three panels in the winglet
-        nxpos=6;
+        nxpos+=2;
         nxyzTS=lstWngTSNumber+2;
         WglTpr=WglTpChord/WglRtChord; /* Winglet taper ratio */
     }
@@ -410,14 +412,26 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     }
     
     /* Create vector containing y-coords of TS, Ail, WTED and Wgl */
-    xpos= (double *)malloc(sizeof(double)*nxpos); 
-    *(xpos+0)=0.0;
-    *(xpos+1)=(100.0-WTEDRlChord)/100.0;
-    *(xpos+2)=(100.0-AilRlChord)/100.0;
-    *(xpos+3)=1.0;
+    xpos= (double *)malloc(sizeof(double)*nxpos);
+    i=0;
+    *(xpos+i)=0.0;
+    if (*ChkWTED == 1)
+    {
+        i++;
+        *(xpos+i)=(100.0-WTEDRlChord)/100.0;
+    }
+    if (*ChkAil == 1)
+    {
+        i++;
+        *(xpos+i)=(100.0-AilRlChord)/100.0;
+    }
+    i++;
+    *(xpos+i)=1.0;
     if (  ChkWGL == 1){
-        *(xpos+4)=WglLeOffset/ WngTSTpChord[lstWngTSNumber-1];
-        *(xpos+5)=(WglLeOffset+WglRtChord)/ WngTSTpChord[lstWngTSNumber-1];
+        i++;
+        *(xpos+i)=WglLeOffset/ WngTSTpChord[lstWngTSNumber-1];
+        i++;
+        *(xpos+i)=(WglLeOffset+WglRtChord)/ WngTSTpChord[lstWngTSNumber-1];
     }
     /* Sort xpos vector */
     qsort(xpos, nxpos, sizeof(double), compare_function);
