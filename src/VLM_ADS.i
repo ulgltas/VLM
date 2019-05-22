@@ -31,6 +31,32 @@
 }
 
 %{
+    #define SWIG_FILE_WITH_INIT
     #include "VLM_ADS.h"
+    #include "vAirfoil.h"
 %}
+%include "numpy.i"
+%init %{
+import_array();
+%}
+
+%apply (int DIM1, double* IN_ARRAY1) {(int len1, double* xpline)}
+%apply (int DIM1, double* ARGOUT_ARRAY1) {(int len2, double* ycamber)}
+%rename (nacafourfivedigit) naca_four_five;
+%exception naca_four_five {
+    $action
+    if (PyErr_Occurred()) SWIG_fail;
+}
+%inline %{
+void naca_four_five(int len1, double* xpline, int len2, double* ycamber, char airfoil[]) {
+    if (len1 != len2) {
+        PyErr_Format(PyExc_ValueError,
+                     "Arrays of lengths (%d,%d) given",
+                     len1, len2);
+    }
+    return nacafourfivedigit(xpline, ycamber, len1, "NACA 0001");
+}
+%}
+
 %include "VLM_ADS.h"
+%include "vAirfoil.h"
