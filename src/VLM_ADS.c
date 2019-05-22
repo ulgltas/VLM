@@ -43,8 +43,12 @@ int main(int argc, char *argv[])
     } else {
         Infile="infile.arp";
     }
-    
-    Outfile="outfile.m";
+
+    if (argc>2) {
+        Outfile=argv[2];
+    } else {
+        Outfile="outfile.m";
+    }
     
     importInputFile(Infile, UVW, &rho, &aoa, &yaw, &m, &mht, &mvt, &n, &nht, &nvt, &ntimes, &timestep_denom, &freewake,
                     delta, beta, eta, zeta, Wngfile, HTailfile, VTailfile);
