@@ -22,28 +22,28 @@ def test(file, iterations, references, tolerances):
         
 def properties(yaw, aileron, flap, elevator, rudder):
     import wing
-    import pythonVLM.VLM_testing as VLMtest
+    import pythonVLM.VLM_inputs as VLMinputs
 
     wing_file = "models/Wing-4Sct.arp"
     wing_chordwise = 8
     wing_spanwise = 13
-    w = VLMtest.VLMDesc(wing_chordwise, wing_spanwise, wing_file)
+    w = VLMinputs.VLMDesc(wing_chordwise, wing_spanwise, wing_file)
     w.set_aileron(aileron)
     w.set_flap(flap)
 
     htail_file = "models/HTail.arp"
     htail_chordwise = 4
     htail_spanwise = 8
-    htail = VLMtest.VLMDesc(htail_chordwise, htail_spanwise, htail_file)
+    htail = VLMinputs.VLMDesc(htail_chordwise, htail_spanwise, htail_file)
     htail.set_elevator(elevator)
 
     vtail_file = "models/VTail.arp"
     vtail_chordwise = 4
     vtail_spanwise = 8
-    vtail = VLMtest.VLMDesc(vtail_chordwise, vtail_spanwise, vtail_file)
+    vtail = VLMinputs.VLMDesc(vtail_chordwise, vtail_spanwise, vtail_file)
     vtail.set_rudder(rudder)
 
-    properties = VLMtest.VLMProperties(w, htail, vtail)
+    properties = VLMinputs.VLMProperties(w, htail, vtail)
 
     properties.u = 30
     properties.rho = 1.225
