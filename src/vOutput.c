@@ -1624,5 +1624,27 @@ void exportTextOutput(char *Outfile, int ntimes, int it, double dt, double *tota
     }
     fprintf(ofp,"];\n");     
     /* Close output file */
-     fclose(ofp);    
+     fclose(ofp);
+     ofp = fopen("outfile.py", "w");
+     if (ofp == NULL) {
+        fprintf(stderr, "Can't open output file %s!\n","outfile.py");
+        exit(1);
+    }
+
+    fprintf(ofp,"it=%i\n",it);
+    fprintf(ofp,"dt=%f\n",dt);
+    
+    fprintf(ofp,"totalforce=[");
+    for (i=0;i<4;i++){
+        for (j=0;j<ntimes;j++){
+            if (j == ntimes-1){
+                fprintf(ofp,"%f,\n",*(totalforce+i+j*4));
+            }
+            else{
+                fprintf(ofp,"%f,",*(totalforce+i+j*4));
+            }
+        }
+    }
+    fprintf(ofp,"]\n");
+    fclose(ofp);
 }
