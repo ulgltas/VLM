@@ -4,7 +4,7 @@
 #
 # Authors : M. SANCHEZ MARTINEZ.
 
-FILE(GLOB SRCS *.h v*.c) # Stores these files in variable SRCS
+FILE(GLOB SRCS *.h *.c) # Stores these files in variable SRCS
 FILE(GLOB SWIGSRCS *.i)
 
 
@@ -23,6 +23,7 @@ IF(${CMAKE_VERSION} VERSION_LESS "3.8.0" AND PYTHON_WRAPPER)
   SWIG_LINK_LIBRARIES(PyVLM ${PYTHON_LIBRARIES})
   set(TARGS ${TARGS} _PyVLM)
 ELSEIF(PYTHON_WRAPPER)
+  SET(CMAKE_SWIG_OUTDIR "${PROJECT_SOURCE_DIR}/bin")
   SWIG_ADD_LIBRARY(PyVLM
                    LANGUAGE python
                    OUTPUT_DIR "${PROJECT_SOURCE_DIR}/bin"
