@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 
 import bird_wing
+import pythonVLM.VLM_testing as VLMtest
 
 yaw = 0.0
 aileron = 0.0
@@ -15,4 +16,4 @@ bird_wing.run()
 references = [-98.26, 0.0, 2826.6, 56.38]
 tolerances = [0.01, 0.0001, 0.1, 0.01]
 
-bird_wing.test("outfile.py", 25, references, tolerances)
+VLMtest.test("outfile.py", 25, references, tolerances)
