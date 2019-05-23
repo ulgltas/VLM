@@ -10,4 +10,6 @@
 
 int main(int argc, char *argv[]);
 
+void run(char *Infile, char *Outfile);
+
 #endif /* VLM_ADS_h */

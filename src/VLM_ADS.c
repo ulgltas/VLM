@@ -23,7 +23,26 @@
 
 int main(int argc, char *argv[])
 {
-    char *Infile, Wngfile[60], HTailfile[60], VTailfile[60], *Outfile;
+    char *Infile, *Outfile;
+    
+    
+    if (argc>1) {
+        Infile=argv[1];
+    } else {
+        Infile="infile.arp";
+    }
+
+    if (argc>2) {
+        Outfile=argv[2];
+    } else {
+        Outfile="outfile.m";
+    }
+    run(Infile, Outfile);
+    return 0;
+}
+void run(char *Infile, char *Outfile)
+{
+    char Wngfile[60], HTailfile[60], VTailfile[60];
     struct liftsurf flap,aileron,wing,htail,elevator,vtail,rudder;
     struct liftsurf *pflap = &flap;
     struct liftsurf *paileron = &aileron;
@@ -37,19 +56,7 @@ int main(int argc, char *argv[])
     double delta[2],beta[2],eta[2],zeta[2];
     int i,j,mtn,it,ntimes,m,n,freewake,mht,nht,mvt,nvt;
     int ChkAil, ChkWTED;
-    
-    if (argc>1) {
-        Infile=argv[1];
-    } else {
-        Infile="infile.arp";
-    }
 
-    if (argc>2) {
-        Outfile=argv[2];
-    } else {
-        Outfile="outfile.m";
-    }
-    
     importInputFile(Infile, UVW, &rho, &aoa, &yaw, &m, &mht, &mvt, &n, &nht, &nvt, &ntimes, &timestep_denom, &freewake,
                     delta, beta, eta, zeta, Wngfile, HTailfile, VTailfile);
         
