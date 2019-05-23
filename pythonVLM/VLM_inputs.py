@@ -154,25 +154,99 @@ class VLMSurface(wing.Wing):
             i+=1
         rel_pos = (span-self.spanPos[i-1])/(self.spanPos[i]-self.spanPos[i-1])
         return self.chord[i]*rel_pos+self.chord[i-1]*(1-rel_pos)
+    def write_geofile(self, filename):
+        import numpy as np
+
+        kind_short = self.kind[0:2]
+
+        offset_p = np.argmin(self.pts[-1][:, 0])
+        end_x = self.pts[-1][offset_p, 0]-self.offset[0]
+        end_z = self.pts[-1][offset_p, 2]-self.offset[1]
+
+        sweep = np.degrees(np.arctan2(end_x, self.b))
+        dihedral = np.degrees(np.arctan2(end_z, self.b))
+        taper = self.chord[-1]/self.chord[0]
+
+        f = open(filename, "w")
+        f.write("{}{}:\t{}\t-01\n".format(self.kind, self.n_airfoil, self.airfoils[0]))
+        f.write("{}{}:\t000\t{}\n".format(self.kind, self.n_sections, self.n-1))
+        if self.kind == "VTL":
+            f.write("VTL301:\t1\t0\t0\n")
+
+        for i in range(0, self.n-1):
+            dy = self.spanPos[i+1]-self.spanPos[i]
+            dx = dy*np.tan(self.sweep_le[i])-self.chord[i]/4+self.chord[i+1]/4
+            sweep_c4 = np.degrees(np.arctan2(dx, dy))
+            dx = dx-self.chord[i]/4+self.chord[i+1]/4
+            sweep_c2 = np.degrees(np.arctan2(dx, dy))
+            f.write("{}{}501:\t{}\t{}\n".format(kind_short, i+1, self.airfoils[i], self.airfoils[i+1]))
+            f.write("{}{}502:\t{}\t{}\t{}\n".format(
+                kind_short, i+1, dy, self.chord[i], self.chord[i+1]))
+            f.write("{}{}503:\t{}\t{}\t{}\t{}\t{}\n".format(
+                kind_short, i+1, 0.0, 0.0, np.rad2deg(self.sweep_le[i]), np.rad2deg(self.dihedral[i]), np.rad2deg(self.twist[i])))
+            f.write("{}{}504: \n".format(kind_short, i+1))
+            f.write("{}{}505: \n".format(kind_short, i+1))
+            f.write("{}{}601: \n".format(kind_short, i+1))
+            f.write("{}{}602: \n".format(kind_short, i+1))
+            f.write("{}{}603:\t{}\t{}\n".format(kind_short, i+1, sweep_c4, sweep_c2))
+        f.write("{}601:\t{}\t{}\t{}\t{}\t{}\n".format(
+            self.kind, 2*self.b, self.offset[0], self.offset[1], self.chord[0], self.chord[-1]))
+        f.write("{}602:\t{}\n".format(self.kind, 2*self.S))
+        f.write("{}603: \n".format(self.kind))
+        f.write("{}604:\t{}\t{}\t{}\t{}\n".format(self.kind, sweep, 0.0, dihedral, 0.0))
+        f.write("{}605:\t{}\t{}\t{}\n".format(self.kind, self.AR, taper, self.AR))
+        f.write("{}606: \n".format(self.kind))
+        f.write("{}607:\t{}\t{}\t{}\t{}\n".format(self.kind, self.mac, self.mac_x, self.mac_y, self.mac_z))
+        self.write_surfaces(f)
+        f.close()
+    def write_surfaces(self, f):
+        pass
 
 
 
 class VLMWing(VLMSurface):
     kind = "WNG"
-
+    n_airfoil = 101 # Code of airfoil line
+    n_sections = 401 # Code of number of sections line
     def initData(self, filenames, span, twist, sweep, dihedral, offset):
         VLMSurface.initData(self, filenames, span, twist, sweep, dihedral, offset)
         self.aileron = VLMControl(0, 0.0)
         self.flap = VLMControl(0, 0.0)
         self.winglet = VLMWinglet(0)
+    def write_surfaces(self, f):
+        f.write("AIL201:\t{}\n".format(self.aileron.exists))
+        if self.aileron.exists==1:
+            f.write("AIL601:\t{}\t{}\n".format(self.aileron.span, self.aileron.root))
+            f.write("AIL603:\t{}\t{}\t{}\n".format(100.0-self.aileron.rel_chord, self.aileron.rel_chord, self.aileron.rel_span))
+        f.write("LED201:\t0\n")
+        f.write("TED201:\t{}\n".format(self.flap.exists))
+        if self.flap.exists==1:
+            f.write("TED601:\t{}\t{}\n".format(self.flap.span, self.flap.root))
+            f.write("TED603:\t{}\t{}\t{}\t{}\n".format(100.0-self.flap.rel_chord, self.flap.rel_chord, self.flap.rel_span, 1.0))
+        f.write("ABK201:\t0\n")
+        f.write("WGL201:\t{}\n".format(self.winglet.exists))
+        if self.winglet.exists==1:
+            f.write("WGL102:\t{}\n".format(self.winglet.airfoil))
+            f.write("WGL601:\t{}\t{}\t{}\n".format(self.winglet.span, self.winglet.root_chord, self.winglet.tip_chord))
+            f.write("WGL602:\t{}\t{}\t{}\n".format(self.winglet.area, self.winglet.sweep_le, self.winglet.dihedral))
+        else:
+            f.write("WGL601:\t0\n")
+        f.write("FLA201:\t0\n")
 
 
 class VLMHTail(VLMSurface):
     kind = "HTL"
-
+    n_airfoil = 102
+    n_sections = 409
     def initData(self, filenames, span, twist, sweep, dihedral, offset):
         VLMSurface.initData(self, filenames, span, twist, sweep, dihedral, offset)
         self.elevator = VLMControl(0, 0.0)
+    def write_surfaces(self, f):
+        f.write("ELV201:\t{}\n".format(self.elevator.exists))
+        if self.elevator.exists==1:
+            f.write("ELV601:\t{}\t{}\n".format(self.elevator.span, self.elevator.root))
+            f.write("ELV603:\t{}\t{}\t{}\n".format(100.0-self.elevator.rel_chord, self.elevator.rel_chord, self.elevator.rel_span))
+        f.write("ELT201: \n")
 
 
 class VLMVTail(VLMSurface):
@@ -208,66 +282,6 @@ class VLMWinglet:
         self.sweep_le = sweep
         self.dihedral = dihedral
         self.airfoil = airfoil
-
-
-def write_geofile(filename, wing):
-    import numpy as np
-    offset_p = np.argmin(wing.pts[-1][:, 0])
-    end_x = wing.pts[-1][offset_p, 0]-wing.offset[0]
-    end_z = wing.pts[-1][offset_p, 2]-wing.offset[1]
-
-    sweep = np.degrees(np.arctan2(end_x, wing.b))
-    dihedral = np.degrees(np.arctan2(end_z, wing.b))
-    taper = wing.chord[-1]/wing.chord[0]
-
-    f = open(filename, "w")
-    f.write("WNG101:\t{}\t-01\n".format(wing.n-1))
-    f.write("WNG401:\t000\t{}\n".format(wing.n-1))
-
-    for i in range(0, wing.n-1):
-        dy = wing.spanPos[i+1]-wing.spanPos[i]
-        dx = dy*np.tan(wing.sweep_le[i])-wing.chord[i]/4+wing.chord[i+1]/4
-        sweep_c4 = np.degrees(np.arctan2(dx, dy))
-        dx = dx-wing.chord[i]/4+wing.chord[i+1]/4
-        sweep_c2 = np.degrees(np.arctan2(dx, dy))
-        f.write("WN{}501:\t{}\t{}\n".format(i+1, wing.airfoils[i], wing.airfoils[i+1]))
-        f.write("WN{}502:\t{}\t{}\t{}\n".format(
-            i+1, dy, wing.chord[i], wing.chord[i+1]))
-        f.write("WN{}503:\t{}\t{}\t{}\t{}\t{}\n".format(
-            i+1, 0.0, 0.0, np.rad2deg(wing.sweep_le[i]), np.rad2deg(wing.dihedral[i]), np.rad2deg(wing.twist[i])))
-        f.write("WN{}504: \n".format(i+1))
-        f.write("WN{}505: \n".format(i+1))
-        f.write("WN{}601: \n".format(i+1))
-        f.write("WN{}602: \n".format(i+1))
-        f.write("WN{}603:\t{}\t{}\n".format(i+1, sweep_c4, sweep_c2))
-    f.write("WNG601:\t{}\t{}\t{}\t{}\t{}\n".format(
-        2*wing.b, wing.offset[0], wing.offset[1], wing.chord[0], wing.chord[-1]))
-    f.write("WNG602:\t{}\n".format(2*wing.S))
-    f.write("WNG603: \n")
-    f.write("WNG604:\t{}\t{}\t{}\t{}\n".format(sweep, 0.0, dihedral, 0.0))
-    f.write("WNG605:\t{}\t{}\t{}\n".format(wing.AR, taper, wing.AR))
-    f.write("WNG606: \n")
-    f.write("WNG607:\t{}\t{}\t{}\t{}\n".format(wing.mac, wing.mac_x, wing.mac_y, wing.mac_z))
-
-    f.write("AIL201:\t{}\n".format(wing.aileron.exists))
-    if wing.aileron.exists==1:
-        f.write("AIL601:\t{}\t{}\n".format(wing.aileron.span, wing.aileron.root))
-        f.write("AIL603:\t{}\t{}\t{}\n".format(100.0-wing.aileron.rel_chord, wing.aileron.rel_chord, wing.aileron.rel_span))
-    f.write("LED201:\t0\n")
-    f.write("TED201:\t{}\n".format(wing.flap.exists))
-    if wing.flap.exists==1:
-        f.write("TED601:\t{}\t{}\n".format(wing.flap.span, wing.flap.root))
-        f.write("TED603:\t{}\t{}\t{}\t{}\n".format(100.0-wing.flap.rel_chord, wing.flap.rel_chord, wing.flap.rel_span, 1.0))
-    f.write("ABK201:\t0\n")
-    f.write("WGL201:\t{}\n".format(wing.winglet.exists))
-    if wing.winglet.exists==1:
-        f.write("WGL102:\t{}\n".format(wing.winglet.airfoil))
-        f.write("WGL601:\t{}\t{}\t{}\n".format(wing.winglet.span, wing.winglet.root_chord, wing.winglet.tip_chord))
-        f.write("WGL602:\t{}\t{}\t{}\n".format(wing.winglet.area, wing.winglet.sweep_le, wing.winglet.dihedral))
-    else:
-            f.write("WGL601:\t0\n")
-    f.write("FLA201:\t0\n")
-    f.close()
 
 
 def isNACA4or5(airfoil):
