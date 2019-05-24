@@ -52,6 +52,7 @@ class VLMDesc:
 
 
 class VLMSurface(wing.Wing):
+    kind = "SUR"
     def initData(self, filenames, span, twist, sweep, dihedral, offset):
         import numpy as np
         import os
@@ -169,10 +170,10 @@ class VLMSurface(wing.Wing):
 
         f = open(filename, "w")
         f.write("{}{}:\t{}\t-01\n".format(self.kind, self.n_airfoil, self.airfoils[0]))
-        f.write("{}{}:\t000\t{}\n".format(self.kind, self.n_sections, self.n-1))
         if self.kind == "VTL":
             f.write("VTL301:\t1\t0\t0\n")
-
+        f.write("{}{}:\t000\t{}\n".format(self.kind, self.n_sections, self.n-1))
+        
         for i in range(0, self.n-1):
             dy = self.spanPos[i+1]-self.spanPos[i]
             dx = dy*np.tan(self.sweep_le[i])-self.chord[i]/4+self.chord[i+1]/4
@@ -251,10 +252,17 @@ class VLMHTail(VLMSurface):
 
 class VLMVTail(VLMSurface):
     kind = "VTL"
-
+    n_airfoil = 102
+    n_sections = 401
     def initData(self, filenames, span, twist, sweep, dihedral, offset):
         VLMSurface.initData(self, filenames, span, twist, sweep, dihedral, offset)
         self.rudder = VLMControl(0, 0.0)
+    def write_surfaces(self, f):
+        f.write("RDR201:\t{}\n".format(self.rudder.exists))
+        if self.rudder.exists==1:
+            f.write("RDR601:\t{}\t{}\n".format(self.rudder.span, self.rudder.root))
+            f.write("RDR603:\t{}\t{}\t{}\n".format(100.0-self.rudder.rel_chord, self.rudder.rel_chord, self.rudder.rel_span))
+        f.write("RDT201: \n")
 
 
 
