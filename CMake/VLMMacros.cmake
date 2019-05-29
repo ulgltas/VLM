@@ -21,6 +21,7 @@ MACRO(MACRO_AddTest srcDir)
         set(spath ${srcDir}/${tfile})
         if(NOT IS_DIRECTORY ${spath} AND ${spath} MATCHES ${inputFile})
             string(REPLACE "${PROJECT_SOURCE_DIR}/" "" strip ${spath}) 
+			file(TO_NATIVE_PATH "${strip}" strip)
             message(STATUS "Adding test ${strip}")
             add_test(NAME ${strip} 
                      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} 
