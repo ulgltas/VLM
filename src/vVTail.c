@@ -17,7 +17,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfile, int m, int n)
+void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfile, int m, int n, int *ChkRdr)
 {
     /* Set up vertical tail */
     
@@ -36,7 +36,7 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     int *ijvtail, *ijrudder;
 
     FILE *fp1;
-    int iTS, VTTSNumber, cond, ChkRdr, npTS, npTSp1, ndouble;
+    int iTS, VTTSNumber, cond, npTS, npTSp1, ndouble;
     int RDRinds[2][2],dummyint,OptVTFusMounted,OptVTTailMounted,OptVTWingMounted;
     char line[110], code[8], VTType[12], VTArf[12], VTSurfFinish[12], nindex[12];
     double VTTSLength[2], VTTSRtChord[2], VTTSTpChord[2];
@@ -129,14 +129,14 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
             sscanf(line,"%s %lf %lf %lf %lf %lf %lf",code,&VTAR,&VTTR,&VTVolCoeff,&VTRlTpChord,&VTRlPosFus,&VTRlVPosHT);
         }
         if ( strncmp("RDR201",line,6) == 0 ){
-            sscanf(line,"%s %i",code,&ChkRdr);
+            sscanf(line,"%s %i",code, ChkRdr);
             cond=1;
         }
     }
     cond=0;
     while(cond == 0){
         fgets(line, 110, fp1);
-        if ( ChkRdr == 1 ){
+        if ( *ChkRdr == 1 ){
             if ( strncmp("RDR601",line,6) == 0 ){
                 sscanf(line,"%s %lf %lf",code,&RdrSpan,&RdrPosSpan);
             }
@@ -168,8 +168,14 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
         }
     } 
     
-    nypos=VTTSNumber+3;
-    nxpos=3;
+    nypos=VTTSNumber+1;
+    nxpos=2;
+    if (*ChkRdr == 1)
+    {
+        nypos += 2;
+        nxpos++;
+    }
+
     nxyzTS=VTTSNumber+1;
     /* Create vector containing y-coords of TS and Rdr */
     ypos= (double *)malloc(sizeof(double)*nypos); 
@@ -185,8 +191,11 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
         *(xTS+i)=VTTSLength[i-1]*tan(VTTSSwpLE[i-1])+*(xTS+i-1);
         *(zTS+i)=sin(pi/2.0-VTTSDhdr[i-1])*VTTSLength[i-1]+*(zTS+i-1);
     }
-    *(ypos+i)=RdrPosSpan;i++;
-    *(ypos+i)=RdrSpan+RdrPosSpan;
+    if (*ChkRdr == 1)
+    {
+        *(ypos+i)=RdrPosSpan;i++;
+        *(ypos+i)=RdrSpan+RdrPosSpan;
+    }
     
     /* Sort ypos vector */
     qsort(ypos, nypos, sizeof(double), compare_function);
@@ -315,7 +324,7 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
             vtailhere=0;
             rudderhere=0;
             /* Check if this point lies on the rudder */
-            if (i >= RDRinds[0][0] && i <= RDRinds[1][0] && j >= RDRinds[0][1] && j <= RDRinds[1][1]){ /* Elevator */
+            if (*ChkRdr==1 && i >= RDRinds[0][0] && i <= RDRinds[1][0] && j >= RDRinds[0][1] && j <= RDRinds[1][1]){ /* Elevator */
                 rudderhere=1;
                 if (i == RDRinds[0][0]){ /* Rudder leading edge */
                     vtailhere=1;

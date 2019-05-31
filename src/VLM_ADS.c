@@ -55,7 +55,7 @@ void run(char *Infile, char *Outfile)
     double UVW[3],aoa,yaw,dt,timestep_denom,MAC,rho,*totalforce;
     double delta[2],beta[2],eta[2],zeta[2];
     int i,j,mtn,it,ntimes,m,n,freewake,mht,nht,mvt,nvt;
-    int ChkAil, ChkWTED, ChkElev;
+    int ChkAil, ChkWTED, ChkElev, ChkRdr;
 
     importInputFile(Infile, UVW, &rho, &aoa, &yaw, &m, &mht, &mvt, &n, &nht, &nvt, &ntimes, &timestep_denom, &freewake,
                     delta, beta, eta, zeta, Wngfile, HTailfile, VTailfile);
@@ -67,7 +67,7 @@ void run(char *Infile, char *Outfile)
     /* Create the lifting surfaces that make up the horizontal tail */
     htailsetup(phtail,pelevator,HTailfile,mht,nht, &ChkElev);
     /* Create the lifting surfaces that make up the vertical tail */
-    vtailsetup(pvtail,prudder,VTailfile,mht,nht);
+    vtailsetup(pvtail,prudder,VTailfile,mht,nht, &ChkRdr);
     dt=MAC/UVW[0]/timestep_denom; /* dt is based on the length of the wing's Mean Aerodynamic Chord */
     printf("MAC=%f, dt=%f\n",MAC,dt);
     
@@ -89,7 +89,10 @@ void run(char *Infile, char *Outfile)
         rotateail(pelevator,eta);
     }
     /* Rotate rudder */
-    rotateail(prudder,zeta);
+    if (ChkRdr == 1)
+    {
+        rotateail(prudder,zeta);
+    }
     
     findneighbours(pwing,pflap,paileron,0,10000,20000);
     findneighbours(pflap,pwing,paileron,10000,0,20000);
