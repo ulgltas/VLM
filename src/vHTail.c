@@ -17,7 +17,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTailfile, int m, int n)
+void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTailfile, int m, int n, int *ChkElev)
 {
     /* Set up horizontal tail */
     
@@ -36,7 +36,7 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     int *ijhtail, *ijelevator;
        
     FILE *fp1;
-    int iTS, HTTSNumber, cond, ChkElev, npTS, npTSp1, ndouble;
+    int iTS, HTTSNumber, cond, npTS, npTSp1, ndouble;
     int ELVinds[2][2],dummyint;
     char line[110], code[8], HTType[12], HTArf[12], HTSurfFinish[12], nindex[12];
     double HTTSLength[3], HTTSRtChord[3], HTTSTpChord[3];
@@ -139,14 +139,14 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
             sscanf(line,"%s %lf %lf %lf",code,&HTAR,&HTTR,&HTVolCoeff);
         }
         if ( strncmp("ELV201",line,6) == 0 ){
-            sscanf(line,"%s %i",code,&ChkElev);
+            sscanf(line,"%s %i",code, ChkElev);
             cond=1;
         }
     }
     cond=0;
     while(cond == 0){
         fgets(line, 110, fp1);
-        if ( ChkElev == 1 ){
+        if ( *ChkElev == 1 ){
             if ( strncmp("ELV601",line,6) == 0 ){
                 sscanf(line,"%s %lf %lf",code,&ElevSpan,&ElevPosSpan);
             }
@@ -181,8 +181,14 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
         }
     }
     
-    nypos=HTTSNumber+3;
-    nxpos=3;
+    nypos=HTTSNumber+1;
+    nxpos=2;
+    if (*ChkElev == 1)
+    {
+        nypos += 2;
+        nxpos++;
+    }
+    
     nxyzTS=HTTSNumber+1;
     /* Create vector containing y-coords of TS and Elev */
     ypos= (double *)malloc(sizeof(double)*nypos); 
@@ -198,8 +204,13 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
         *(xTS+i)=HTTSLength[i-1]*tan(HTTSSwpLE[i-1])+*(xTS+i-1);
         *(zTS+i)=sin(HTTSDhdr[i-1])*HTTSLength[i-1]+*(zTS+i-1);
     }
-    *(ypos+i)=ElevPosSpan;i++;
-    *(ypos+i)=ElevSpan/2.0+ElevPosSpan; /* ElevSpan is the total elevator span */
+    if (*ChkElev == 1)
+    {
+        *(ypos+i)=ElevPosSpan;i++;
+        *(ypos+i)=ElevSpan/2.0+ElevPosSpan; /* ElevSpan is the total elevator span */
+    }
+    
+    
     
     /* Sort ypos vector */
     qsort(ypos, nypos, sizeof(double), compare_function);
@@ -224,8 +235,13 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     /* Create vector containing x-coords of TS and Elev */
     xpos= (double *)malloc(sizeof(double)*nxpos); 
     *(xpos+0)=0.0;
-    *(xpos+1)=(100.0-ElevRlChord)/100.0;
-    *(xpos+2)=1.0;
+    i = 1;
+    if (*ChkElev == 1)
+    {
+        *(xpos+1)=(100.0-ElevRlChord)/100.0;
+        i++;
+    }
+    *(xpos+i)=1.0;
     /* Sort xpos vector */
     qsort(xpos, nxpos, sizeof(double), compare_function);
     /* Remove repeated values from ypos vector */   
@@ -244,8 +260,11 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     /* Create vector containing the full spanwise grid */
     createypline(xpos,nxpos,xpline,mp1);
     /* Check between which elements of xpline lies the elevator */
-    ELVinds[0][0]=findindex(xpline,mp1,(100.0-ElevRlChord)/100.0);
-    ELVinds[1][0]=m; /* Will always lie on the trailing edge */    
+    if (*ChkElev == 1)
+    {
+        ELVinds[0][0]=findindex(xpline,mp1,(100.0-ElevRlChord)/100.0);
+        ELVinds[1][0]=m; /* Will always lie on the trailing edge */
+    }
 
     /* Create matrix of non-dimensional camber lines */
     rewind(fp1);
@@ -339,7 +358,7 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
             htailhere=0;
             elevatorhere=0;
             /* Check if this point lies on the elevator */
-            if (i >= ELVinds[0][0] && i <= ELVinds[1][0] && j >= ELVinds[0][1] && j <= ELVinds[1][1]){ /* Elevator */
+            if (*ChkElev == 1 && i >= ELVinds[0][0] && i <= ELVinds[1][0] && j >= ELVinds[0][1] && j <= ELVinds[1][1]){ /* Elevator */
                 elevatorhere=1;
                 if (i == ELVinds[0][0]){ /* Elevator leading edge */
                     htailhere=1;

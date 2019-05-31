@@ -55,7 +55,7 @@ void run(char *Infile, char *Outfile)
     double UVW[3],aoa,yaw,dt,timestep_denom,MAC,rho,*totalforce;
     double delta[2],beta[2],eta[2],zeta[2];
     int i,j,mtn,it,ntimes,m,n,freewake,mht,nht,mvt,nvt;
-    int ChkAil, ChkWTED;
+    int ChkAil, ChkWTED, ChkElev;
 
     importInputFile(Infile, UVW, &rho, &aoa, &yaw, &m, &mht, &mvt, &n, &nht, &nvt, &ntimes, &timestep_denom, &freewake,
                     delta, beta, eta, zeta, Wngfile, HTailfile, VTailfile);
@@ -65,7 +65,7 @@ void run(char *Infile, char *Outfile)
     /* Create the lifting surfaces that make up the wing */
     MAC=wingsetup(pflap,paileron,pwing,Wngfile,m,n, &ChkAil, &ChkWTED);
     /* Create the lifting surfaces that make up the horizontal tail */
-    htailsetup(phtail,pelevator,HTailfile,mht,nht);
+    htailsetup(phtail,pelevator,HTailfile,mht,nht, &ChkElev);
     /* Create the lifting surfaces that make up the vertical tail */
     vtailsetup(pvtail,prudder,VTailfile,mht,nht);
     dt=MAC/UVW[0]/timestep_denom; /* dt is based on the length of the wing's Mean Aerodynamic Chord */
@@ -84,7 +84,10 @@ void run(char *Infile, char *Outfile)
     }
     
     /* Rotate elevator */
-    rotateail(pelevator,eta);
+    if (ChkElev == 1)
+    {
+        rotateail(pelevator,eta);
+    }
     /* Rotate rudder */
     rotateail(prudder,zeta);
     

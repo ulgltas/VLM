@@ -10,6 +10,6 @@
 
 #include "vLiftsurf.h"
 
-void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTailfile, int m, int n);
+void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTailfile, int m, int n, int *ChkElev);
 
 #endif /* vHTail_h */
