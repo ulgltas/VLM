@@ -193,7 +193,8 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     }
     if (*ChkRdr == 1)
     {
-        *(ypos+i)=RdrPosSpan;i++;
+        *(ypos+i)=RdrPosSpan;
+        i++;
         *(ypos+i)=RdrSpan+RdrPosSpan;
     }
     
@@ -218,10 +219,16 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     RDRinds[1][1]=findindex(ypline,np1,RdrSpan+RdrPosSpan); 
     
     /* Create vector containing x-coords of TS and Rdr */
-    xpos= (double *)malloc(sizeof(double)*nxpos); 
+    xpos = (double *)malloc(sizeof(double)*nxpos);
     *(xpos+0)=0.0;
-    *(xpos+1)=(100.0-RdrRlChord)/100.0;
-    *(xpos+2)=1.0;
+    i = 1;
+    if (*ChkRdr == 1)
+    {
+        *(xpos+i)=(100.0-RdrRlChord)/100.0;
+        i++; 
+    }
+    *(xpos+i)=1.0;
+    
     /* Sort xpos vector */
     qsort(xpos, nxpos, sizeof(double), compare_function);
     /* Remove repeated values from xpos vector */   
