@@ -27,7 +27,6 @@ v_root_chord = 0.5
 v_offset = [5.0, 6.0]
 
 vtail = inputs.VLMVTail(v_airfoils, v_span, v_taper, v_sweep, v_dihedral, v_twist, v_root_chord, v_offset)
-vtail.rudder.add_control(vtail, 0.8, 0.1, 0.2)
 
 h_span = [1.0]
 h_taper = [0.5, 0.5]
@@ -39,7 +38,6 @@ h_offset = [5.0, 6.0]
 
 
 htail = inputs.VLMHTail(airfoils, h_span, h_taper, h_sweep, h_dihedral, h_twist, h_root_chord, h_offset)
-htail.elevator.add_control(htail, 0.5, 0.1, 0.1)
 
 w.write_geofile("Wing.arp")
 htail.write_geofile("HTail.arp")
