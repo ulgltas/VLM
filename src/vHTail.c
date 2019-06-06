@@ -228,6 +228,7 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     }    
     /* Create vector containing the full spanwise grid */
     createypline(ypos,nypos,ypline,np1);
+    free(ypos);
     /* Check between which elements of ypline lies the elevator */    
     ELVinds[0][1]=findindex(ypline,np1,ElevPosSpan);
     ELVinds[1][1]=findindex(ypline,np1,ElevSpan/2+ElevPosSpan);
@@ -259,6 +260,7 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     }
     /* Create vector containing the full spanwise grid */
     createypline(xpos,nxpos,xpline,mp1);
+    free(xpos);
     /* Check between which elements of xpline lies the elevator */
     if (*ChkElev == 1)
     {
@@ -316,8 +318,13 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
             zplineTp=*(ycamberall+i+(2*iTS+1)*mp1)*HTTSTpChord[iTS]; /* Tip camber line of trapezoidal section */
             *(zpgrid+i+j*mp1)=(zplineTp-zplineRt)/HTTSLength[iTS]*(yhere-*(yTS+iTS))+zplineRt;
         }
-    }    
-
+    }
+    free(xpline);
+    free(chordvec);
+    free(levec);
+    free(ycamber);
+    free(ycamberall);
+    free(xTS);
     /* wake shedding distance */
     dxw=0.3*minchord/m;
     vortexpanel(xv,yv,zv,xpgrid,ypgrid,zpgrid,dxw,m,n);  
@@ -426,8 +433,17 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
                 *(ijhtail+mp1*np1+htail_nvert-1)=j;
             }
         }
-    }     
-
+    }
+    free(ypline);
+    free(xv);
+    free(yv);
+    free(zv);
+    free(xpgrid);
+    free(ypgrid);
+    free(zpgrid);
+    free(yTS);
+    free(yTS2);
+    free(zTS);
     /* Count number of panels on all halves of lifting surfaces */
     elevator_nface=countfaces(ijelevator,elevator_nvert,mp1,np1);
     htail_nface=countfaces(ijhtail,htail_nvert,mp1,np1);   
@@ -438,15 +454,27 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     pelevator->faces=(int *)malloc(sizeof(int)*pelevator->nface*4); 
     pelevator->shedding=(int *)malloc(sizeof(int)*pelevator->nface); 
     arrangefaces(ijelevator,mp1,np1,pelevator);  
-    
+    free(ijelevator);
     /* Create all the panel information in the htail liftsurf structure */
     phtail->nface=2*htail_nface;
     phtail->nvert=2*htail_nvert;
     phtail->faces=(int *)malloc(sizeof(int)*phtail->nface*4); 
     phtail->shedding=(int *)malloc(sizeof(int)*phtail->nface); 
     arrangefaces(ijhtail,mp1,np1,phtail);
-
+    free(ijhtail);
     /* Copy all panel vertex information to the relevant liftsurf structures */
     assignvertices(pelevator,xelevator,yelevator,zelevator,xvelevator,yvelevator,zvelevator);
-    assignvertices(phtail,xhtail,yhtail,zhtail,xvhtail,yvhtail,zvhtail);     
+    free(xelevator);
+    free(yelevator);
+    free(zelevator);
+    free(xvelevator);
+    free(yvelevator);
+    free(zvelevator);
+    assignvertices(phtail,xhtail,yhtail,zhtail,xvhtail,yvhtail,zvhtail);
+    free(xhtail);
+    free(yhtail);
+    free(zhtail);
+    free(xvhtail);
+    free(yvhtail);
+    free(zvhtail);
 }

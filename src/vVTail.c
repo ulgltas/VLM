@@ -28,7 +28,7 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     int vtail_nvert,rudder_nvert,vtail_nface,rudder_nface;
     
     double *ypos,*xpos,RDRypos[2],*ylim,*xlim;
-    double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,twistcentre,*ycamber,*ycamberall,*ycamberwgl;
+    double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,twistcentre,*ycamber,*ycamberall;
     double *xv,*yv,*zv,dxw,minchord;
     double *xvtail,*yvtail,*zvtail,*xrudder,*yrudder,*zrudder,*chordvec,*levec;
     double *xvvtail,*yvvtail,*zvvtail,*xvrudder,*yvrudder,*zvrudder;
@@ -239,6 +239,8 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     }
     /* Create vector containing the full spanwise grid */
     createypline(xpos,nxpos,xpline,mp1);
+    free(ypos);
+    free(xpos);
     /* Check between which elements of xpline lies the elevator */
     RDRinds[0][0]=findindex(xpline,mp1,(100.0-RdrRlChord)/100.0);
     RDRinds[1][0]=m; /* Will always lie on the trailing edge */ 
@@ -287,8 +289,12 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
             zplineTp=*(ycamberall+i+(2*iTS+1)*mp1)*VTTSTpChord[iTS]; /* Tip camber line of trapezoidal section */
             *(zpgrid+i+j*mp1)=(zplineTp-zplineRt)/VTTSLength[iTS]*(yhere-*(yTS+iTS))+zplineRt;
         }
-    } 
-
+    }
+    free(xpline);
+    free(ycamberall);
+    free(chordvec);
+    free(levec);
+    free(ycamber);
     /* wake shedding distance */
     dxw=0.3*minchord/m;
     vortexpanel(xv,yv,zv,xpgrid,ypgrid,zpgrid,dxw,m,n);  
@@ -382,8 +388,18 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
                 *(ijvtail+mp1*np1+vtail_nvert-1)=j;
             }
         }
-    }     
-    
+    }
+    free(ypline);
+    free(xv);
+    free(yv);
+    free(zv);
+    free(xpgrid);
+    free(ypgrid);
+    free(zpgrid);
+    free(xTS);
+    free(yTS);
+    free(yTS2);
+    free(zTS);
     /* Count number of panels on all halves of lifting surfaces */
     rudder_nface=countfaces(ijrudder,rudder_nvert,mp1,np1);
     vtail_nface=countfaces(ijvtail,vtail_nvert,mp1,np1);   
@@ -394,15 +410,27 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     prudder->faces=(int *)malloc(sizeof(int)*prudder->nface*4); 
     prudder->shedding=(int *)malloc(sizeof(int)*prudder->nface); 
     arrangefaces(ijrudder,mp1,np1,prudder);  
-    
+    free(ijrudder);
     /* Create all the panel information in the vtail liftsurf structure */
     pvtail->nface=2*vtail_nface;
     pvtail->nvert=2*vtail_nvert;
     pvtail->faces=(int *)malloc(sizeof(int)*pvtail->nface*4); 
     pvtail->shedding=(int *)malloc(sizeof(int)*pvtail->nface); 
     arrangefaces(ijvtail,mp1,np1,pvtail);
-
+    free(ijvtail);
     /* Copy all panel vertex information to the relevant liftsurf structures */
     assignvertices_fin(prudder,xrudder,yrudder,zrudder,xvrudder,yvrudder,zvrudder,OptVTFusMounted,OptVTTailMounted,OptVTWingMounted);
+    free(xrudder);
+    free(yrudder);
+    free(zrudder);
+    free(xvrudder);
+    free(yvrudder);
+    free(zvrudder);
     assignvertices_fin(pvtail,xvtail,yvtail,zvtail,xvvtail,yvvtail,zvvtail,OptVTFusMounted,OptVTTailMounted,OptVTWingMounted);
+    free(xvtail);
+    free(yvtail);
+    free(zvtail);
+    free(xvvtail);
+    free(yvvtail);
+    free(zvvtail);
 }

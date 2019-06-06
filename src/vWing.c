@@ -291,6 +291,10 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
             cond=1;
         }        
     }
+    if (*ChkWTED == 1)
+    {
+        free(WTEDStopPoint);
+    }
     if (*ChkWTED == 0)
     {
         WTEDSpan = 0.0;
@@ -388,9 +392,10 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     if (n <= nypos){
         fprintf(stderr,"Error:  The number of spanwise panels on the wing should be larger than %i\n",nypos);
         exit(1);
-    }    
+    }
     /* Create vector containing the full spanwise grid */
     createypline(ypos,nypos,ypline,np1);
+    free(ypos);
     /* Check between which elements of ypline lie the aileron, flap and winglet */
 
     if (*ChkWTED == 1)
@@ -450,6 +455,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     }
     /* Create vector containing the full spanwise grid */
     createypline(xpos,nxpos,xpline,mp1);
+    free(xpos);
     /* Check between which elements of ypline lie the aileron, flap and winglet */
     WTEDinds[0][0]=findindex(xpline,mp1,(100.0-WTEDRlChord)/100.0);
     WTEDinds[1][0]=m; /* Will always lie on the trailing edge */
@@ -532,8 +538,14 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
                 *(zpgrid+i+j*mp1)=(zplineTp-zplineRt)/WglSpan*(yhere-*(yTS+iTS))+zplineRt;
             }
         }
-    }    
-    
+    }
+    free(xpline);
+    free(chordvec);
+    free(levec);
+    free(ycamber);
+    free(ycamberwgl);
+    free(ycamberall);
+    free(xTS);
     /* wake shedding distance */
     dxw=0.3*minchord/m;
     vortexpanel(xv,yv,zv,xpgrid,ypgrid,zpgrid,dxw,m,n);  
@@ -709,7 +721,16 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
             }
         }
     }    
-    
+    free(ypline);
+    free(xv);
+    free(yv);
+    free(zv);
+    free(xpgrid);
+    free(ypgrid);
+    free(zpgrid);
+    free(yTS);
+    free(yTS2);
+    free(zTS);
     /* Count number of panels on all halves of lifting surfaces */
     flap_nface=countfaces(ijflap,flap_nvert,mp1,np1);
     aileron_nface=countfaces(ijaileron,aileron_nvert,mp1,np1); 
@@ -721,25 +742,42 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     pflap->faces=(int *)malloc(sizeof(int)*pflap->nface*4); 
     pflap->shedding=(int *)malloc(sizeof(int)*pflap->nface); 
     arrangefaces(ijflap,mp1,np1,pflap);  
-
+    free(ijflap);
     /* Create all the panel information in the aileron liftsurf structure */
     paileron->nface=2*aileron_nface;
     paileron->nvert=2*aileron_nvert;
     paileron->faces=(int *)malloc(sizeof(int)*paileron->nface*4); 
     paileron->shedding=(int *)malloc(sizeof(int)*paileron->nface); 
     arrangefaces(ijaileron,mp1,np1,paileron);
-    
+    free(ijaileron);
     /* Create all the panel information in the wing liftsurf structure */
     pwing->nface=2*wing_nface;
     pwing->nvert=2*wing_nvert;
     pwing->faces=(int *)malloc(sizeof(int)*pwing->nface*4); 
     pwing->shedding=(int *)malloc(sizeof(int)*pwing->nface); 
     arrangefaces(ijwing,mp1,np1,pwing);
-
+    free(ijwing);
     /* Copy all panel vertex information to the relevant liftsurf structures */
     assignvertices(pflap,xflap,yflap,zflap,xvflap,yvflap,zvflap);
+    free(xflap);
+    free(yflap);
+    free(zflap);
+    free(xvflap);
+    free(yvflap);
+    free(zvflap);
     assignvertices(paileron,xaileron,yaileron,zaileron,xvaileron,yvaileron,zvaileron);
-    assignvertices(pwing,xwing,ywing,zwing,xvwing,yvwing,zvwing);     
-    
+    free(xaileron);
+    free(yaileron);
+    free(zaileron);
+    free(xvaileron);
+    free(yvaileron);
+    free(zvaileron);
+    assignvertices(pwing,xwing,ywing,zwing,xvwing,yvwing,zvwing);
+    free(xwing);
+    free(ywing);
+    free(zwing);
+    free(xvwing);
+    free(yvwing);
+    free(zvwing);
     return WngMAC;
 }
