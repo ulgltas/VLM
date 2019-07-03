@@ -6,20 +6,15 @@
 #include <string.h>
 #include "vAlgebra.h"
 #include "vAssignValues.h"
-#include "vControl.h"
+#include "vGeometrySetup.h"
+#include "vSetup.h"
 #include "vInput.h"
 #include "vOutput.h"
 #include "vForce.h"
-#include "vGeometry.h"
 #include "vInfluence.h"
 #include "vLiftsurf.h"
-#include "vNeighbours.h"
 #include "vRHS.h"
-#include "vVortex.h"
 #include "vWake.h"
-#include "vHTail.h"
-#include "vVTail.h"
-#include "vWing.h"
 
 int main(int argc, char *argv[])
 {
@@ -52,113 +47,14 @@ void run(char *Infile, char *Outfile)
     struct liftsurf *pvtail = &vtail;
     struct liftsurf *prudder = &rudder;
     double *invAN,*AN,*BN,*RHS, *Gammas, *wind;
-    double UVW[3],aoa,yaw,dt,timestep_denom,MAC,rho,*totalforce;
+    double UVW[3],dt, MAC,rho,*totalforce;
     double delta[2],beta[2],eta[2],zeta[2];
-    int i,j,mtn,it,ntimes,m,n,freewake,mht,nht,mvt,nvt;
-    int ChkAil, ChkWTED, ChkElev, ChkRdr;
-
-    importInputFile(Infile, UVW, &rho, &aoa, &yaw, &m, &mht, &mvt, &n, &nht, &nvt, &ntimes, &timestep_denom, &freewake,
-                    delta, beta, eta, zeta, Wngfile, HTailfile, VTailfile);
-        
+    int i,j,mtn,it,ntimes, freewake;
+    
+    dt = setup(Infile, UVW, &rho, &ntimes, &freewake, pwing, pflap, paileron, phtail, pelevator, pvtail, prudder);
+    mtn = geometry_setup(pwing, pflap, paileron, phtail, pelevator, pvtail, prudder);
     totalforce=(double *)calloc(ntimes*4, sizeof(double));
-    
-    /* Create the lifting surfaces that make up the wing */
-    MAC=wingsetup(pflap,paileron,pwing,Wngfile,m,n, &ChkAil, &ChkWTED);
-    /* Create the lifting surfaces that make up the horizontal tail */
-    htailsetup(phtail,pelevator,HTailfile,mht,nht, &ChkElev);
-    /* Create the lifting surfaces that make up the vertical tail */
-    vtailsetup(pvtail,prudder,VTailfile,mht,nht, &ChkRdr);
-    dt=MAC/UVW[0]/timestep_denom; /* dt is based on the length of the wing's Mean Aerodynamic Chord */
-    printf("MAC=%f, dt=%f\n",MAC,dt);
-    
-    /* Rotate ailerons */
-    if (ChkAil == 1)
-    {
-        rotateail(paileron, delta);
-    }
-    
-    /* Rotate flaps */
-    if (ChkWTED == 1)
-    {
-        rotateail(pflap, beta);
-    }
-    
-    /* Rotate elevator */
-    if (ChkElev == 1)
-    {
-        rotateail(pelevator,eta);
-    }
-    /* Rotate rudder */
-    if (ChkRdr == 1)
-    {
-        rotateail(prudder,zeta);
-    }
-    
-    findneighbours(pwing,pflap,paileron,0,10000,20000);
-    findneighbours(pflap,pwing,paileron,10000,0,20000);
-    findneighbours(paileron,pwing,pflap,20000,0,10000);
-    findneighbours(phtail,pelevator,paileron,30000,40000,20000); /* We don't care about paileron being called here */
-    findneighbours(pelevator,phtail,paileron,40000,30000,20000); /* We don't care about paileron being called here */
-    findneighbours(pvtail,prudder,paileron,50000,60000,20000); /* We don't care about paileron being called here */
-    findneighbours(prudder,pvtail,paileron,60000,50000,20000); /* We don't care about paileron being called here */
 
-    /* Create the wake */
-    createwake(pwing,0,ntimes);
-    createwake(pflap,10000,ntimes);
-    createwake(paileron,20000,ntimes); 
-    createwake(phtail,30000,ntimes); 
-    createwake(pelevator,40000,ntimes); 
-    createwake(pvtail,50000,ntimes); 
-    createwake(prudder,60000,ntimes); 
-    
-    /* Find which bound vortex panels correspond to which wake panel vertices */
-    correspshedwake(pwing);
-    correspshedwake(pflap);
-    correspshedwake(paileron);
-    correspshedwake(phtail);
-    correspshedwake(pelevator);
-    correspshedwake(pvtail);
-    correspshedwake(prudder);
-    
-    /* Shed first wake element */
-    shedwake(pwing);
-    shedwake(pflap);
-    shedwake(paileron);
-    shedwake(phtail);
-    shedwake(pelevator);
-    shedwake(pvtail);
-    shedwake(prudder);
-    findallwakeneighbours(pwing,pflap,paileron,0,10000,20000);
-    findallwakeneighbours(phtail,pelevator,paileron,30000,40000,20000); /* We don't care about paileron being called here */
-    findallwakeneighbours(pvtail,prudder,paileron,50000,60000,20000); /* We don't care about paileron being called here */
-    
-    /* Calculate collocation points and vortex segment lengths */
-    colvec(pflap);
-    colvec(paileron);
-    colvec(pwing);
-    colvec(phtail);
-    colvec(pelevator);
-    colvec(pvtail);
-    colvec(prudder);
-    /* Calculate normal vectors and surfaces */
-    normals(pflap);
-    normals(paileron);
-    normals(pwing);
-    normals(phtail);
-    normals(pelevator);
-    normals(pvtail);
-    normals(prudder);
-    /* Calculate tangential vectors */
-    tangentials(pflap);
-    tangentials(paileron);
-    tangentials(pwing);
-    tangentials(phtail);
-    tangentials(pelevator);
-    tangentials(pvtail);
-    tangentials(prudder);
-    /* Calculate total number of panels */
-    mtn=flap.nface+wing.nface+aileron.nface+htail.nface+elevator.nface+vtail.nface+rudder.nface;
-    
     /* Assign memory for global matrices */
     AN=(double *)calloc(mtn*mtn, sizeof(double)); /* Normal flow coefficient matrix */
     invAN=(double *)malloc(sizeof(double)*mtn*mtn); /* Inverse of normal flow coefficient matrix */
