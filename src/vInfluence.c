@@ -8,6 +8,7 @@
 #include "vLiftsurf.h"
 #include "vVLMData.h"
 #include "vInfluence.h"
+#include "vAlgebra.h"
 #include "vVortex.h"
 
 void infcoeff(struct liftsurf *plift1, struct liftsurf *plift2, double *AN, double *BN, int istart, int jstart, int mtn)
@@ -243,4 +244,6 @@ void cycleliftsurf(struct VLMData *data)
     /* Influence on the rudder from the rudder */
     n+=(data->vtail).nface;
     infcoeff(&(data->rudder),&(data->rudder),data->AN,data->BN,m,n,data->mtn);
+    /* Invert the influence coefficient matrix */
+    gauss(data->AN, data->invAN, data->mtn);
 }
