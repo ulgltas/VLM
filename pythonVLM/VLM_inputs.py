@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 
 import wing
-import PyVLM
+import CVLM
 
 
 class VLMProperties:
@@ -73,7 +73,7 @@ class VLMSurface(wing.Wing):
                 xpline = np.linspace(0, 1, n)
                 airfoil = "NACA " + m.group("number")
                 self.airfoils.append(airfoil)
-                ycamber = PyVLM.nacafourfivedigit(xpline, n, airfoil)
+                ycamber = CVLM.nacafourfivedigit(xpline, n, airfoil)
                 fname = os.path.join("models", airfoil+".dat")
                 if not os.path.isfile(fname):
                     f = open(fname, "w")
@@ -128,7 +128,10 @@ class VLMSurface(wing.Wing):
             dy = self.spanPos[i]-self.spanPos[i-1]
             dc = self.chord[i-1]-self.chord[i]
             mac_integrand += dy*(self.chord[i-1]**2.0-dc*self.chord[i-1]+dc**2.0/3)
-        self.mac = 1/self.S*mac_integrand
+        if self.S>0.0:
+            self.mac = 1/self.S*mac_integrand
+        else:
+            self.mac = self.chord[0]
         # Find MAC location
         self.mac_x = 0.0
         self.mac_y = 0.0
