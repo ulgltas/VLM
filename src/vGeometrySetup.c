@@ -42,4 +42,19 @@ void geometry_setup(struct VLMData *data)
     tangentials(&(data->vtail));
     tangentials(&(data->rudder));
 }
+
+void reset_wake(struct VLMData *data)
+{
+    for (int i=0;i<((data->wing).nshed+(data->wing).nwakes)*data->ntimes;i++)
+    {
+        *((data->wing).xw+i)=0.0;
+        *((data->wing).yw+i)=0.0;
+        *((data->wing).zw+i)=0.0;
+    }
+    /* Set contents of pwing->gw to zero */
+    for (int i=0;i<(data->wing).nshed*data->ntimes;i++)
+    {
+        *((data->wing).gw+i)=0.0;
+    }
+    shedwake(&data->wing);
 }
