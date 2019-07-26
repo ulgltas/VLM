@@ -6,6 +6,7 @@
 //
 
 #include "vLiftsurf.h"
+#include "vVLMData.h"
 #include "vSetup.h"
 #include "vControl.h"
 #include "vWing.h"
@@ -15,94 +16,97 @@
 #include "vInput.h"
 #include "vNeighbours.h"
 #include <stdio.h>
+#include <stdlib.h>
 
-double setup(char* Infile, double UVW[3], double *rho, int *ntimes, int *freewake, struct liftsurf *pwing, struct liftsurf *pflap,
-             struct liftsurf *paileron, struct liftsurf *phtail, struct liftsurf *pelevator, struct liftsurf *pvtail, struct liftsurf *prudder)
+void setup(char* Infile, struct VLMData *data)
 {
     int m, n, mht, nht, mvt, nvt;
-    double delta[2],beta[2],eta[2],zeta[2];
-    double aoa, yaw, timestep_denom, MAC, dt;
-    char Wngfile[60], HTailfile[60], VTailfile[60];
+    double yaw, timestep_denom;
+    char Wngfile[70], HTailfile[70], VTailfile[70];
     int ChkAil, ChkWTED, ChkElev, ChkRdr;
-    importInputFile(Infile, UVW, rho, &aoa, &yaw, &m, &mht, &mvt, &n, &nht, &nvt, ntimes, &timestep_denom, freewake,
-                    delta, beta, eta, zeta, Wngfile, HTailfile, VTailfile);
+    importInputFile(Infile, (data->UVW), &(data->rho), &(data->aoa), &yaw, &m, &mht, &mvt, &n, &nht, &nvt, &(data->ntimes), &timestep_denom, &(data->freewake),
+                    (data->delta), (data->beta), (data->eta), (data->zeta), Wngfile, HTailfile, VTailfile);
         
     
     /* Create the lifting surfaces that make up the wing */
-    MAC=wingsetup(pflap,paileron,pwing,Wngfile,m,n, &ChkAil, &ChkWTED);
+    data->MAC=wingsetup(&(data->flap),&(data->aileron),&(data->wing),Wngfile,m,n, &ChkAil, &ChkWTED);
     /* Create the lifting surfaces that make up the horizontal tail */
-    htailsetup(phtail,pelevator,HTailfile,mht,nht, &ChkElev);
+    htailsetup(&(data->htail),&(data->elevator),HTailfile,mht,nht, &ChkElev);
     /* Create the lifting surfaces that make up the vertical tail */
-    vtailsetup(pvtail,prudder,VTailfile,mht,nht, &ChkRdr);
-    dt=MAC/UVW[0]/timestep_denom; /* dt is based on the length of the wing's Mean Aerodynamic Chord */
-    printf("MAC=%f, dt=%f\n",MAC,dt);
+    vtailsetup(&(data->vtail),&(data->rudder),VTailfile,mht,nht, &ChkRdr);
+    data->dt=data->MAC/data->UVW[0]/timestep_denom; /* dt is based on the length of the wing's Mean Aerodynamic Chord */
+    printf("MAC=%f, dt=%f\n",data->MAC,data->dt);
     
     /* Rotate ailerons */
     if (ChkAil == 1)
     {
-        rotateail(paileron, delta);
+        rotateail(&(data->aileron), (data->delta));
     }
     
     /* Rotate flaps */
     if (ChkWTED == 1)
     {
-        rotateail(pflap, beta);
+        rotateail(&(data->flap), (data->beta));
     }
     
     /* Rotate elevator */
     if (ChkElev == 1)
     {
-        rotateail(pelevator,eta);
+        rotateail(&(data->elevator),(data->eta));
     }
     /* Rotate rudder */
     if (ChkRdr == 1)
     {
-        rotateail(prudder,zeta);
+        rotateail(&(data->rudder),(data->zeta));
     }
 
-    findneighbours(pwing,pflap,paileron,0,10000,20000);
-    findneighbours(pflap,pwing,paileron,10000,0,20000);
-    findneighbours(paileron,pwing,pflap,20000,0,10000);
-    findneighbours(phtail,pelevator,paileron,30000,40000,20000); /* We don't care about paileron being called here */
-    findneighbours(pelevator,phtail,paileron,40000,30000,20000); /* We don't care about paileron being called here */
-    findneighbours(pvtail,prudder,paileron,50000,60000,20000); /* We don't care about paileron being called here */
-    findneighbours(prudder,pvtail,paileron,60000,50000,20000); /* We don't care about paileron being called here */
+    findneighbours(&(data->wing),&(data->flap),&(data->aileron),0,10000,20000);
+    findneighbours(&(data->flap),&(data->wing),&(data->aileron),10000,0,20000);
+    findneighbours(&(data->aileron),&(data->wing),&(data->flap),20000,0,10000);
+    findneighbours(&(data->htail),&(data->elevator),&(data->aileron),30000,40000,20000); /* We don't care about &(data->aileron) being called here */
+    findneighbours(&(data->elevator),&(data->htail),&(data->aileron),40000,30000,20000); /* We don't care about &(data->aileron) being called here */
+    findneighbours(&(data->vtail),&(data->rudder),&(data->aileron),50000,60000,20000); /* We don't care about &(data->aileron) being called here */
+    findneighbours(&(data->rudder),&(data->vtail),&(data->aileron),60000,50000,20000); /* We don't care about &(data->aileron) being called here */
 
     /* Create the wake */
-    createwake(pwing,0,*ntimes);
-    createwake(pflap,10000,*ntimes);
-    createwake(paileron,20000,*ntimes);
-    createwake(phtail,30000,*ntimes);
-    createwake(pelevator,40000,*ntimes);
-    createwake(pvtail,50000,*ntimes);
-    createwake(prudder,60000,*ntimes);
+    createwake(&(data->wing),0,(data->ntimes));
+    createwake(&(data->flap),10000,(data->ntimes));
+    createwake(&(data->aileron),20000,(data->ntimes));
+    createwake(&(data->htail),30000,(data->ntimes));
+    createwake(&(data->elevator),40000,(data->ntimes));
+    createwake(&(data->vtail),50000,(data->ntimes));
+    createwake(&(data->rudder),60000,(data->ntimes));
 
     /* Find which bound vortex panels correspond to which wake panel vertices */
-    correspshedwake(pwing);
-    correspshedwake(pflap);
-    correspshedwake(paileron);
-    correspshedwake(phtail);
-    correspshedwake(pelevator);
-    correspshedwake(pvtail);
-    correspshedwake(prudder);
+    correspshedwake(&(data->wing));
+    correspshedwake(&(data->flap));
+    correspshedwake(&(data->aileron));
+    correspshedwake(&(data->htail));
+    correspshedwake(&(data->elevator));
+    correspshedwake(&(data->vtail));
+    correspshedwake(&(data->rudder));
 
     /* Shed first wake element */
-    shedwake(pwing);
-    shedwake(pflap);
-    shedwake(paileron);
-    shedwake(phtail);
-    shedwake(pelevator);
-    shedwake(pvtail);
-    shedwake(prudder);
-    findallwakeneighbours(pwing,pflap,paileron,0,10000,20000);
-    findallwakeneighbours(phtail,pelevator,paileron,30000,40000,20000); /* We don't care about paileron being called here */
-    findallwakeneighbours(pvtail,prudder,paileron,50000,60000,20000); /* We don't care about paileron being called here */
-    printf("%i\n",pwing->nface);
-    printf("%i\n",pflap->nface);
-    printf("%i\n",paileron->nface);
-    printf("%i\n",phtail->nface);
-    printf("%i\n",pelevator->nface);
-    printf("%i\n",pvtail->nface);
-    printf("%i\n",prudder->nface);
-    return dt;
+    shedwake(&(data->wing));
+    shedwake(&(data->flap));
+    shedwake(&(data->aileron));
+    shedwake(&(data->htail));
+    shedwake(&(data->elevator));
+    shedwake(&(data->vtail));
+    shedwake(&(data->rudder));
+    findallwakeneighbours(&(data->wing),&(data->flap),&(data->aileron),0,10000,20000);
+    findallwakeneighbours(&(data->htail),&(data->elevator),&(data->aileron),30000,40000,20000); /* We don't care about &(data->aileron) being called here */
+    findallwakeneighbours(&(data->vtail),&(data->rudder),&(data->aileron),50000,60000,20000); /* We don't care about &(data->aileron) being called here */
+    /* Calculate total number of panels */
+    data->mtn = (data->flap).nface+(data->wing).nface+(data->aileron).nface+(data->htail).nface+(data->elevator).nface+(data->vtail).nface+(data->rudder).nface;
+    /* Assign memory for global matrices */
+    data->AN=(double *)calloc(data->mtn*data->mtn, sizeof(double)); /* Normal flow coefficient matrix */
+    data->invAN=(double *)malloc(sizeof(double)*data->mtn*data->mtn); /* Inverse of normal flow coefficient matrix */
+    data->BN=(double *)calloc(data->mtn*data->mtn, sizeof(double)); /* Downwash coefficient matrix */
+    data->RHS=(double *)malloc(sizeof(double)*data->mtn); /* Right Hand Side vector */
+    data->Gammas = (double *)malloc(sizeof(double)*data->mtn); /* Vorticity vector history */
+    data->wind=(double *)malloc(sizeof(double)*data->mtn); /* Induced windspeeds */
+
+    data->totalforce=(double *)calloc(data->ntimes*4, sizeof(double));
+}
 }

@@ -8,9 +8,10 @@
 #define vInfluence_h
 
 #include "vLiftsurf.h"
+#include "vVLMData.h"
 
 void infcoeff(struct liftsurf *plift1, struct liftsurf *plift2, double *AN, double *BN, int istart, int jstart,int mtn);
 
-void cycleliftsurf(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *phtail, struct liftsurf *pelevator, struct liftsurf *pvtail, struct liftsurf *prudder, double *AN, double *BN, int mtn);
+void cycleliftsurf(struct VLMData *data);
 
 #endif /* vInfluence_h */

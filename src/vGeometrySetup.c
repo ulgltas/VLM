@@ -6,49 +6,40 @@
 //
 
 #include "vLiftsurf.h"
+#include "vVLMData.h"
 #include "vGeometrySetup.h"
 #include "vGeometry.h"
+#include "vPanel.h"
 #include "vVortex.h"
+#include "vWake.h"
 #include <stdio.h>
+#include <stdlib.h>
 
-int geometry_setup(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *phtail,
-                    struct liftsurf *pelevator, struct liftsurf *pvtail, struct liftsurf *prudder)
+void geometry_setup(struct VLMData *data)
 {
-    printf("%p\n",pwing);
-    printf("%p\n",pflap);
-    printf("%p\n",paileron);
-    printf("%i\n",pwing->nface);
-    printf("%i\n",pflap->nface);
-    printf("%i\n",paileron->nface);
-    printf("%i\n",phtail->nface);
-    printf("%i\n",pelevator->nface);
-    printf("%i\n",pvtail->nface);
-    printf("%i\n",prudder->nface);
     /* Calculate collocation points and vortex segment lengths */
-    colvec(pflap);
-    colvec(paileron);
-    colvec(pwing);
-    colvec(phtail);
-    colvec(pelevator);
-    colvec(pvtail);
-    colvec(prudder);
-    printf("Colvec\n");
+    colvec(&(data->flap));
+    colvec(&(data->aileron));
+    colvec(&(data->wing));
+    colvec(&(data->htail));
+    colvec(&(data->elevator));
+    colvec(&(data->vtail));
+    colvec(&(data->rudder));
     /* Calculate normal vectors and surfaces */
-    normals(pflap);
-    normals(paileron);
-    normals(pwing);
-    normals(phtail);
-    normals(pelevator);
-    normals(pvtail);
-    normals(prudder);
+    normals(&(data->flap));
+    normals(&(data->aileron));
+    normals(&(data->wing));
+    normals(&(data->htail));
+    normals(&(data->elevator));
+    normals(&(data->vtail));
+    normals(&(data->rudder));
     /* Calculate tangential vectors */
-    tangentials(pflap);
-    tangentials(paileron);
-    tangentials(pwing);
-    tangentials(phtail);
-    tangentials(pelevator);
-    tangentials(pvtail);
-    tangentials(prudder);
-    /* Calculate total number of panels */
-    return pflap->nface+pwing->nface+paileron->nface+phtail->nface+pelevator->nface+pvtail->nface+prudder->nface;
+    tangentials(&(data->flap));
+    tangentials(&(data->aileron));
+    tangentials(&(data->wing));
+    tangentials(&(data->htail));
+    tangentials(&(data->elevator));
+    tangentials(&(data->vtail));
+    tangentials(&(data->rudder));
+}
 }

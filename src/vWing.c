@@ -27,7 +27,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     
     double *ypos,*xpos,Ailypos[2],WTEDypos[2],*ylim,*xlim;
     double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,twistcentre,*ycamber,*ycamberall,*ycamberwgl;
-    double *xv,*yv,*zv,dxw,minchord;
+    double *xv,*yv,*zv,minchord;
     double *xwing,*ywing,*zwing,*xflap,*yflap,*zflap,*xaileron,*yaileron,*zaileron,*chordvec,*levec;
     double *xvwing,*yvwing,*zvwing,*xvflap,*yvflap,*zvflap,*xvaileron,*yvaileron,*zvaileron;
     double zplineRt,zplineTp,twistangle,dihedral,xpTS,ypTS,zpTS;
@@ -547,8 +547,8 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     free(ycamberall);
     free(xTS);
     /* wake shedding distance */
-    dxw=0.3*minchord/m;
-    vortexpanel(xv,yv,zv,xpgrid,ypgrid,zpgrid,dxw,m,n);  
+    pwing->dxw=0.3*minchord/m;
+    vortexpanel(xv,yv,zv,xpgrid,ypgrid,zpgrid,pwing->dxw,m,n);  
          
     /* Assign wing grid cells to wing, aileron and flap */
     xwing= (double *)malloc(sizeof(double)*mp1*np1); 

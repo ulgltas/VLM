@@ -9,6 +9,7 @@
 #define vWake_h
 
 #include "vLiftsurf.h"
+#include "vVLMData.h"
 
 void storewakeinds(struct liftsurf *pwing);
 
@@ -32,7 +33,7 @@ void infonwake(struct liftsurf *pwing, struct liftsurf *pflap, int it, int summo
 
 void wakeinf(struct liftsurf *pwing, struct liftsurf *pflap, int nw, int it, int summode);
 
-void calcwakeinf(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *phtail, struct liftsurf *pelevator, struct liftsurf *pvtail, struct liftsurf *prudder, int it);
+void calcwakeinf(struct VLMData *data, int it);
 
 void addlastwind(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, int it, int narg);
 

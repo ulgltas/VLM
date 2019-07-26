@@ -8,9 +8,10 @@
 #define vAssignValues_h
 
 #include "vLiftsurf.h"
+#include "vVLMData.h"
 
-void assignGammas(double *Gammas, struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *phtail, struct liftsurf *pelevator, struct liftsurf *pvtail, struct liftsurf *prudder, int it);
+void assignGammas(struct VLMData *data, int it);
 
-void assignwind(double *wind, struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *phtail, struct liftsurf *pelevator, struct liftsurf *pvtail, struct liftsurf *prudder);
+void assignwind(struct VLMData *data);
 
 #endif /* vAssignValues_h */

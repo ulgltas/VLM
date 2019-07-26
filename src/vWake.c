@@ -7,6 +7,7 @@
 
 #include "vWake.h"
 #include "vLiftsurf.h"
+#include "vVLMData.h"
 #include "vVortex.h"
 #include <stdlib.h>
 
@@ -490,7 +491,7 @@ void wakeinf(struct liftsurf *pwing, struct liftsurf *pflap, int nw, int it, int
     }
 }
 
-void calcwakeinf(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *phtail, struct liftsurf *pelevator, struct liftsurf *pvtail, struct liftsurf *prudder, int it)
+void calcwakeinf(struct VLMData *data, int it)
 {
     /* Calculate the influence of every wake on every liftsurf */
     /* Treat the vtail and elevator as uncoupled */
@@ -498,216 +499,216 @@ void calcwakeinf(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf
     
     /* Influence on the wing */
     /* Influence of the wing wake */
-    for (i=0;i<pwing->nwakes;i++){
+    for (i=0;i<(data->wing).nwakes;i++){
         /* We set summode to i so summode=0 the first time we calculate an influence */
-        wakeinf(pwing,pwing,i,it,i);
+        wakeinf(&(data->wing),&(data->wing),i,it,i);
     }
     /* Influence of the flap wake */
-    for (i=0;i<pflap->nwakes;i++){
-        wakeinf(pwing,pflap,i,it,1);
+    for (i=0;i<(data->flap).nwakes;i++){
+        wakeinf(&(data->wing),&(data->flap),i,it,1);
     }
     /* Influence of the aileron wake */
-    for (i=0;i<paileron->nwakes;i++){
-        wakeinf(pwing,paileron,i,it,1);
+    for (i=0;i<(data->aileron).nwakes;i++){
+        wakeinf(&(data->wing),&(data->aileron),i,it,1);
     }
     /* Influence of the horizontal tail wake */
-    for (i=0;i<phtail->nwakes;i++){
-        wakeinf(pwing,phtail,i,it,1);
+    for (i=0;i<(data->htail).nwakes;i++){
+        wakeinf(&(data->wing),&(data->htail),i,it,1);
     }
     /* Influence of the elevator wake */
-    for (i=0;i<pelevator->nwakes;i++){
-        wakeinf(pwing,pelevator,i,it,1);
+    for (i=0;i<(data->elevator).nwakes;i++){
+        wakeinf(&(data->wing),&(data->elevator),i,it,1);
     } 
 //     /* Influence of the vertical tail wake */
-//     for (i=0;i<pvtail->nwakes;i++){
-//         wakeinf(pwing,pvtail,i,it,1);
+//     for (i=0;i<(data->vtail).nwakes;i++){
+//         wakeinf(&(data->wing),&(data->vtail),i,it,1);
 //     }
 //     /* Influence of the rudder wake */
-//     for (i=0;i<prudder->nwakes;i++){
-//         wakeinf(pwing,prudder,i,it,1);
+//     for (i=0;i<(data->rudder).nwakes;i++){
+//         wakeinf(&(data->wing),&(data->rudder),i,it,1);
 //     }     
     /* Influence on the flap */
     /* Influence of the wing wake */
-    for (i=0;i<pwing->nwakes;i++){
+    for (i=0;i<(data->wing).nwakes;i++){
         /* We set summode to i so summode=0 the first time we calculate an influence */
-        wakeinf(pflap,pwing,i,it,i);
+        wakeinf(&(data->flap),&(data->wing),i,it,i);
     }
     /* Influence of the flap wake */
-    for (i=0;i<pflap->nwakes;i++){
-        wakeinf(pflap,pflap,i,it,1);
+    for (i=0;i<(data->flap).nwakes;i++){
+        wakeinf(&(data->flap),&(data->flap),i,it,1);
     }
     /* Influence of the aileron wake */
-    for (i=0;i<paileron->nwakes;i++){
-        wakeinf(pflap,paileron,i,it,1);
+    for (i=0;i<(data->aileron).nwakes;i++){
+        wakeinf(&(data->flap),&(data->aileron),i,it,1);
     } 
     /* Influence of the horizontal tail wake */
-    for (i=0;i<phtail->nwakes;i++){
-        wakeinf(pflap,phtail,i,it,1);
+    for (i=0;i<(data->htail).nwakes;i++){
+        wakeinf(&(data->flap),&(data->htail),i,it,1);
     } 
     /* Influence of the elevator wake */
-    for (i=0;i<pelevator->nwakes;i++){
-        wakeinf(pflap,pelevator,i,it,1);
+    for (i=0;i<(data->elevator).nwakes;i++){
+        wakeinf(&(data->flap),&(data->elevator),i,it,1);
     } 
 //     /* Influence of the vertical tail wake */
-//     for (i=0;i<pvtail->nwakes;i++){
-//         wakeinf(pflap,pvtail,i,it,1);
+//     for (i=0;i<(data->vtail).nwakes;i++){
+//         wakeinf(&(data->flap),&(data->vtail),i,it,1);
 //     }
 //     /* Influence of the rudder wake */
-//     for (i=0;i<prudder->nwakes;i++){
-//         wakeinf(pflap,prudder,i,it,1);
+//     for (i=0;i<(data->rudder).nwakes;i++){
+//         wakeinf(&(data->flap),&(data->rudder),i,it,1);
 //     }     
     /* Influence on the aileron */
     /* Influence of the wing wake */
-    for (i=0;i<pwing->nwakes;i++){
+    for (i=0;i<(data->wing).nwakes;i++){
         /* We set summode to i so summode=0 the first time we calculate an influence */
-        wakeinf(paileron,pwing,i,it,i);
+        wakeinf(&(data->aileron),&(data->wing),i,it,i);
     }
     /* Influence of the flap wake */
-    for (i=0;i<pflap->nwakes;i++){
-        wakeinf(paileron,pflap,i,it,1);
+    for (i=0;i<(data->flap).nwakes;i++){
+        wakeinf(&(data->aileron),&(data->flap),i,it,1);
     }
     /* Influence of the aileron wake */
-    for (i=0;i<paileron->nwakes;i++){
-        wakeinf(paileron,paileron,i,it,1);
+    for (i=0;i<(data->aileron).nwakes;i++){
+        wakeinf(&(data->aileron),&(data->aileron),i,it,1);
     }  
     /* Influence of the horizontal tail wake */
-    for (i=0;i<phtail->nwakes;i++){
-        wakeinf(paileron,phtail,i,it,1);
+    for (i=0;i<(data->htail).nwakes;i++){
+        wakeinf(&(data->aileron),&(data->htail),i,it,1);
     }
     /* Influence of the elevator wake */
-    for (i=0;i<pelevator->nwakes;i++){
-        wakeinf(paileron,pelevator,i,it,1);
+    for (i=0;i<(data->elevator).nwakes;i++){
+        wakeinf(&(data->aileron),&(data->elevator),i,it,1);
     }  
 //     /* Influence of the vertical tail wake */
-//     for (i=0;i<pvtail->nwakes;i++){
-//         wakeinf(paileron,pvtail,i,it,1);
+//     for (i=0;i<(data->vtail).nwakes;i++){
+//         wakeinf(&(data->aileron),&(data->vtail),i,it,1);
 //     }
 //     /* Influence of the rudder wake */
-//     for (i=0;i<prudder->nwakes;i++){
-//         wakeinf(paileron,prudder,i,it,1);
+//     for (i=0;i<(data->rudder).nwakes;i++){
+//         wakeinf(&(data->aileron),&(data->rudder),i,it,1);
 //     } 
     /* Influence on the horizontal tail */
     /* Influence of the wing wake */
-    for (i=0;i<pwing->nwakes;i++){
+    for (i=0;i<(data->wing).nwakes;i++){
         /* We set summode to i so summode=0 the first time we calculate an influence */
-        wakeinf(phtail,pwing,i,it,i);
+        wakeinf(&(data->htail),&(data->wing),i,it,i);
     }
     /* Influence of the flap wake */
-    for (i=0;i<pflap->nwakes;i++){
-        wakeinf(phtail,pflap,i,it,1);
+    for (i=0;i<(data->flap).nwakes;i++){
+        wakeinf(&(data->htail),&(data->flap),i,it,1);
     }
     /* Influence of the aileron wake */
-    for (i=0;i<paileron->nwakes;i++){
-        wakeinf(phtail,paileron,i,it,1);
+    for (i=0;i<(data->aileron).nwakes;i++){
+        wakeinf(&(data->htail),&(data->aileron),i,it,1);
     }  
     /* Influence of the horizontal tail wake */
-    for (i=0;i<phtail->nwakes;i++){
-        wakeinf(phtail,phtail,i,it,1);
+    for (i=0;i<(data->htail).nwakes;i++){
+        wakeinf(&(data->htail),&(data->htail),i,it,1);
     }
     /* Influence of the elevator wake */
-    for (i=0;i<pelevator->nwakes;i++){
-        wakeinf(phtail,pelevator,i,it,1);
+    for (i=0;i<(data->elevator).nwakes;i++){
+        wakeinf(&(data->htail),&(data->elevator),i,it,1);
     } 
 //     /* Influence of the vertical tail wake */
-//     for (i=0;i<pvtail->nwakes;i++){
-//         wakeinf(phtail,pvtail,i,it,1);
+//     for (i=0;i<(data->vtail).nwakes;i++){
+//         wakeinf(&(data->htail),&(data->vtail),i,it,1);
 //     }
 //     /* Influence of the rudder wake */
-//     for (i=0;i<prudder->nwakes;i++){
-//         wakeinf(phtail,prudder,i,it,1);
+//     for (i=0;i<(data->rudder).nwakes;i++){
+//         wakeinf(&(data->htail),&(data->rudder),i,it,1);
 //     }    
     /* Influence on the elevator tail */
     /* Influence of the wing wake */
-    for (i=0;i<pwing->nwakes;i++){
+    for (i=0;i<(data->wing).nwakes;i++){
         /* We set summode to i so summode=0 the first time we calculate an influence */
-        wakeinf(pelevator,pwing,i,it,i);
+        wakeinf(&(data->elevator),&(data->wing),i,it,i);
     }
     /* Influence of the flap wake */
-    for (i=0;i<pflap->nwakes;i++){
-        wakeinf(pelevator,pflap,i,it,1);
+    for (i=0;i<(data->flap).nwakes;i++){
+        wakeinf(&(data->elevator),&(data->flap),i,it,1);
     }
     /* Influence of the aileron wake */
-    for (i=0;i<paileron->nwakes;i++){
-        wakeinf(pelevator,paileron,i,it,1);
+    for (i=0;i<(data->aileron).nwakes;i++){
+        wakeinf(&(data->elevator),&(data->aileron),i,it,1);
     }  
     /* Influence of the horizontal tail wake */
-    for (i=0;i<phtail->nwakes;i++){
-        wakeinf(pelevator,phtail,i,it,1);
+    for (i=0;i<(data->htail).nwakes;i++){
+        wakeinf(&(data->elevator),&(data->htail),i,it,1);
     }
     /* Influence of the elevator wake */
-    for (i=0;i<pelevator->nwakes;i++){
-        wakeinf(pelevator,pelevator,i,it,1);
+    for (i=0;i<(data->elevator).nwakes;i++){
+        wakeinf(&(data->elevator),&(data->elevator),i,it,1);
     }     
 //     /* Influence of the vertical tail wake */
-//     for (i=0;i<pvtail->nwakes;i++){
-//         wakeinf(pelevator,pvtail,i,it,1);
+//     for (i=0;i<(data->vtail).nwakes;i++){
+//         wakeinf(&(data->elevator),&(data->vtail),i,it,1);
 //     }
 //     /* Influence of the rudder wake */
-//     for (i=0;i<prudder->nwakes;i++){
-//         wakeinf(pelevator,prudder,i,it,1);
+//     for (i=0;i<(data->rudder).nwakes;i++){
+//         wakeinf(&(data->elevator),&(data->rudder),i,it,1);
 //     } 
     /* Influence on the vertical tail */
 //     /* Influence of the wing wake */
-//     for (i=0;i<pwing->nwakes;i++){
+//     for (i=0;i<(data->wing).nwakes;i++){
 //         /* We set summode to i so summode=0 the first time we calculate an influence */
-//         wakeinf(pvtail,pwing,i,it,i);
+//         wakeinf(&(data->vtail),&(data->wing),i,it,i);
 //     }
 //     /* Influence of the flap wake */
-//     for (i=0;i<pflap->nwakes;i++){
-//         wakeinf(pvtail,pflap,i,it,1);
+//     for (i=0;i<(data->flap).nwakes;i++){
+//         wakeinf(&(data->vtail),&(data->flap),i,it,1);
 //     }
 //     /* Influence of the aileron wake */
-//     for (i=0;i<paileron->nwakes;i++){
-//         wakeinf(pvtail,paileron,i,it,1);
+//     for (i=0;i<(data->aileron).nwakes;i++){
+//         wakeinf(&(data->vtail),&(data->aileron),i,it,1);
 //     }  
 //     /* Influence of the horizontal tail wake */
-//     for (i=0;i<phtail->nwakes;i++){
-//         wakeinf(pvtail,phtail,i,it,1);
+//     for (i=0;i<(data->htail).nwakes;i++){
+//         wakeinf(&(data->vtail),&(data->htail),i,it,1);
 //     }
 //     /* Influence of the elevator wake */
-//     for (i=0;i<pelevator->nwakes;i++){
-//         wakeinf(pvtail,pelevator,i,it,1);
+//     for (i=0;i<(data->elevator).nwakes;i++){
+//         wakeinf(&(data->vtail),&(data->elevator),i,it,1);
 //     } 
     /* Influence of the vertical tail wake */
-    for (i=0;i<pvtail->nwakes;i++){
+    for (i=0;i<(data->vtail).nwakes;i++){
         /* We set summode to i so summode=0 the first time we calculate an influence */
-        wakeinf(pvtail,pvtail,i,it,i);
+        wakeinf(&(data->vtail),&(data->vtail),i,it,i);
     }
     /* Influence of the rudder wake */
-    for (i=0;i<prudder->nwakes;i++){
-        wakeinf(pvtail,prudder,i,it,1);
+    for (i=0;i<(data->rudder).nwakes;i++){
+        wakeinf(&(data->vtail),&(data->rudder),i,it,1);
     }    
     /* Influence on the rudder */
 //     /* Influence of the wing wake */
-//     for (i=0;i<pwing->nwakes;i++){
+//     for (i=0;i<(data->wing).nwakes;i++){
 //         /* We set summode to i so summode=0 the first time we calculate an influence */
-//         wakeinf(prudder,pwing,i,it,i);
+//         wakeinf(&(data->rudder),&(data->wing),i,it,i);
 //     }
 //     /* Influence of the flap wake */
-//     for (i=0;i<pflap->nwakes;i++){
-//         wakeinf(prudder,pflap,i,it,1);
+//     for (i=0;i<(data->flap).nwakes;i++){
+//         wakeinf(&(data->rudder),&(data->flap),i,it,1);
 //     }
 //     /* Influence of the aileron wake */
-//     for (i=0;i<paileron->nwakes;i++){
-//         wakeinf(prudder,paileron,i,it,1);
+//     for (i=0;i<(data->aileron).nwakes;i++){
+//         wakeinf(&(data->rudder),&(data->aileron),i,it,1);
 //     }  
 //     /* Influence of the horizontal tail wake */
-//     for (i=0;i<phtail->nwakes;i++){
-//         wakeinf(prudder,phtail,i,it,1);
+//     for (i=0;i<(data->htail).nwakes;i++){
+//         wakeinf(&(data->rudder),&(data->htail),i,it,1);
 //     }
 //     /* Influence of the elevator wake */
-//     for (i=0;i<pelevator->nwakes;i++){
-//         wakeinf(prudder,pelevator,i,it,1);
+//     for (i=0;i<(data->elevator).nwakes;i++){
+//         wakeinf(&(data->rudder),&(data->elevator),i,it,1);
 //     } 
     /* Influence of the vertical tail wake */
-    for (i=0;i<pvtail->nwakes;i++){
+    for (i=0;i<(data->vtail).nwakes;i++){
         /* We set summode to i so summode=0 the first time we calculate an influence */
-        wakeinf(prudder,pvtail,i,it,i);
+        wakeinf(&(data->rudder),&(data->vtail),i,it,i);
     }
     /* Influence of the rudder wake */
-    for (i=0;i<prudder->nwakes;i++){
-        wakeinf(prudder,prudder,i,it,1);
-    } 
+    for (i=0;i<(data->rudder).nwakes;i++){
+        wakeinf(&(data->rudder),&(data->rudder),i,it,1);
+    }
 }
 
 void latestwakeinf(struct liftsurf *pwing, struct liftsurf *pflap, int nw)

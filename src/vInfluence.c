@@ -6,6 +6,8 @@
 //
 
 #include "vLiftsurf.h"
+#include "vVLMData.h"
+#include "vInfluence.h"
 #include "vVortex.h"
 
 void infcoeff(struct liftsurf *plift1, struct liftsurf *plift2, double *AN, double *BN, int istart, int jstart, int mtn)
@@ -75,7 +77,7 @@ void infcoeff(struct liftsurf *plift1, struct liftsurf *plift2, double *AN, doub
     }
 }
 
-void cycleliftsurf(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *phtail, struct liftsurf *pelevator, struct liftsurf *pvtail, struct liftsurf *prudder, double *AN, double *BN, int mtn)
+void cycleliftsurf(struct VLMData *data)
 {
     int m,n;
     
@@ -84,161 +86,161 @@ void cycleliftsurf(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsu
     m=0;
     n=0;
     /* Influence on the wing from the wing */
-    infcoeff(pwing,pwing,AN,BN,m,n,mtn);
+    infcoeff(&(data->wing),&(data->wing),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the wing from the flap */
-    n+=pwing->nface;
-    infcoeff(pwing,pflap,AN,BN,m,n,mtn);
+    n+=(data->wing).nface;
+    infcoeff(&(data->wing),&(data->flap),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the wing from the aileron */
-    n+=pflap->nface;
-    infcoeff(pwing,paileron,AN,BN,m,n,mtn);
+    n+=(data->flap).nface;
+    infcoeff(&(data->wing),&(data->aileron),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the wing from the horizontal tail */
-    n+=paileron->nface;
-    infcoeff(pwing,phtail,AN,BN,m,n,mtn);
+    n+=(data->aileron).nface;
+    infcoeff(&(data->wing),&(data->htail),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the wing from the elevator */
-    n+=phtail->nface;
-    infcoeff(pwing,pelevator,AN,BN,m,n,mtn);
+    n+=(data->htail).nface;
+    infcoeff(&(data->wing),&(data->elevator),data->AN,data->BN,m,n,data->mtn);
 //     /* Influence on the wing from the vertical tail */
-//     n+=pelevator->nface;
-//     infcoeff(pwing,pvtail,AN,BN,m,n,mtn);
+//     n+=(data->elevator).nface;
+//     infcoeff(&(data->wing),&(data->vtail),data->AN,data->BN,m,n,data->mtn);
 //     /* Influence on the wing from the rudder */
-//     n+=pvtail->nface;
-//     infcoeff(pwing,prudder,AN,BN,m,n,mtn);
+//     n+=(data->vtail).nface;
+//     infcoeff(&(data->wing),&(data->rudder),data->AN,data->BN,m,n,data->mtn);
 
-    m+=pwing->nface;
+    m+=(data->wing).nface;
     n=0;
     /* Influence on the flap from the wing */
-    infcoeff(pflap,pwing,AN,BN,m,n,mtn);
+    infcoeff(&(data->flap),&(data->wing),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the flap from the flap */
-    n+=pwing->nface;
-    infcoeff(pflap,pflap,AN,BN,m,n,mtn);
+    n+=(data->wing).nface;
+    infcoeff(&(data->flap),&(data->flap),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the flap from the aileron */
-    n+=pflap->nface;
-    infcoeff(pflap,paileron,AN,BN,m,n,mtn);
+    n+=(data->flap).nface;
+    infcoeff(&(data->flap),&(data->aileron),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the flap from the horizontal tail */
-    n+=paileron->nface;
-    infcoeff(pflap,phtail,AN,BN,m,n,mtn);
+    n+=(data->aileron).nface;
+    infcoeff(&(data->flap),&(data->htail),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the flap from the elevator */
-    n+=phtail->nface;
-    infcoeff(pflap,pelevator,AN,BN,m,n,mtn);
+    n+=(data->htail).nface;
+    infcoeff(&(data->flap),&(data->elevator),data->AN,data->BN,m,n,data->mtn);
 //     /* Influence on the flap from the vertical tail */
-//     n+=pelevator->nface;
-//     infcoeff(pflap,pvtail,AN,BN,m,n,mtn);
+//     n+=(data->elevator).nface;
+//     infcoeff(&(data->flap),&(data->vtail),data->AN,data->BN,m,n,data->mtn);
 //     /* Influence on the flap from the rudder */
-//     n+=pvtail->nface;
-//     infcoeff(pflap,prudder,AN,BN,m,n,mtn);
+//     n+=(data->vtail).nface;
+//     infcoeff(&(data->flap),&(data->rudder),data->AN,data->BN,m,n,data->mtn);
     
-    m+=pflap->nface;
+    m+=(data->flap).nface;
     n=0;
     /* Influence on the aileron from the wing */
-    infcoeff(paileron,pwing,AN,BN,m,n,mtn);
+    infcoeff(&(data->aileron),&(data->wing),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the aileron from the flap */
-    n+=pwing->nface;
-    infcoeff(paileron,pflap,AN,BN,m,n,mtn);
+    n+=(data->wing).nface;
+    infcoeff(&(data->aileron),&(data->flap),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the aileron from the aileron */
-    n+=pflap->nface;
-    infcoeff(paileron,paileron,AN,BN,m,n,mtn);
+    n+=(data->flap).nface;
+    infcoeff(&(data->aileron),&(data->aileron),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the aileron from the horizontal tail */
-    n+=paileron->nface;
-    infcoeff(paileron,phtail,AN,BN,m,n,mtn);
+    n+=(data->aileron).nface;
+    infcoeff(&(data->aileron),&(data->htail),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the aileron from the elevator */
-    n+=phtail->nface;
-    infcoeff(paileron,pelevator,AN,BN,m,n,mtn);
+    n+=(data->htail).nface;
+    infcoeff(&(data->aileron),&(data->elevator),data->AN,data->BN,m,n,data->mtn);
 //     /* Influence on the aileron from the vertical tail */
-//     n+=pelevator->nface;
-//     infcoeff(paileron,pvtail,AN,BN,m,n,mtn);
+//     n+=(data->elevator).nface;
+//     infcoeff(&(data->aileron),&(data->vtail),data->AN,data->BN,m,n,data->mtn);
 //     /* Influence on the aileron from the rudder */
-//     n+=pvtail->nface;
-//     infcoeff(paileron,prudder,AN,BN,m,n,mtn);
+//     n+=(data->vtail).nface;
+//     infcoeff(&(data->aileron),&(data->rudder),data->AN,data->BN,m,n,data->mtn);
     
-    m+=paileron->nface;
+    m+=(data->aileron).nface;
     n=0;
     /* Influence on the horizontal tail from the wing */
-    infcoeff(phtail,pwing,AN,BN,m,n,mtn);
+    infcoeff(&(data->htail),&(data->wing),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the horizontal tail from the flap */
-    n+=pwing->nface;
-    infcoeff(phtail,pflap,AN,BN,m,n,mtn);
+    n+=(data->wing).nface;
+    infcoeff(&(data->htail),&(data->flap),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the horizontal tail from the aileron */
-    n+=pflap->nface;
-    infcoeff(phtail,paileron,AN,BN,m,n,mtn);
+    n+=(data->flap).nface;
+    infcoeff(&(data->htail),&(data->aileron),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the horizontal tail from the horizontal tail */
-    n+=paileron->nface;
-    infcoeff(phtail,phtail,AN,BN,m,n,mtn);
+    n+=(data->aileron).nface;
+    infcoeff(&(data->htail),&(data->htail),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the horizontal tail from the elevator */
-    n+=phtail->nface;
-    infcoeff(phtail,pelevator,AN,BN,m,n,mtn);
+    n+=(data->htail).nface;
+    infcoeff(&(data->htail),&(data->elevator),data->AN,data->BN,m,n,data->mtn);
 //     /* Influence on the horizontal tail from the vertical tail */
-//     n+=pelevator->nface;
-//     infcoeff(phtail,pvtail,AN,BN,m,n,mtn);
+//     n+=(data->elevator).nface;
+//     infcoeff(&(data->htail),&(data->vtail),data->AN,data->BN,m,n,data->mtn);
 //     /* Influence on the horizontal tail from the rudder */
-//     n+=pvtail->nface;
-//     infcoeff(phtail,prudder,AN,BN,m,n,mtn);
+//     n+=(data->vtail).nface;
+//     infcoeff(&(data->htail),&(data->rudder),data->AN,data->BN,m,n,data->mtn);
     
-    m+=phtail->nface;
+    m+=(data->htail).nface;
     n=0;
     /* Influence on the elevator from the wing */
-    infcoeff(pelevator,pwing,AN,BN,m,n,mtn);
+    infcoeff(&(data->elevator),&(data->wing),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the elevator from the flap */
-    n+=pwing->nface;
-    infcoeff(pelevator,pflap,AN,BN,m,n,mtn);
+    n+=(data->wing).nface;
+    infcoeff(&(data->elevator),&(data->flap),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the elevator from the aileron */
-    n+=pflap->nface;
-    infcoeff(pelevator,paileron,AN,BN,m,n,mtn);
+    n+=(data->flap).nface;
+    infcoeff(&(data->elevator),&(data->aileron),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the elevator from the horizontal tail */
-    n+=paileron->nface;
-    infcoeff(pelevator,phtail,AN,BN,m,n,mtn);
+    n+=(data->aileron).nface;
+    infcoeff(&(data->elevator),&(data->htail),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the elevator from the elevator */
-    n+=phtail->nface;
-    infcoeff(pelevator,pelevator,AN,BN,m,n,mtn);
+    n+=(data->htail).nface;
+    infcoeff(&(data->elevator),&(data->elevator),data->AN,data->BN,m,n,data->mtn);
 //     /* Influence on the elevator from the vertical tail */
-//     n+=pelevator->nface;
-//     infcoeff(pelevator,pvtail,AN,BN,m,n,mtn);
+//     n+=(data->elevator).nface;
+//     infcoeff(&(data->elevator),&(data->vtail),data->AN,data->BN,m,n,data->mtn);
 //     /* Influence on the elevator from the rudder */
-//     n+=pvtail->nface;
-//     infcoeff(pelevator,prudder,AN,BN,m,n,mtn);
+//     n+=(data->vtail).nface;
+//     infcoeff(&(data->elevator),&(data->rudder),data->AN,data->BN,m,n,data->mtn);
 
-    m+=pelevator->nface;
+    m+=(data->elevator).nface;
     n=0;
     /* Influence on the vertical tail from the wing */
-//    infcoeff(pvtail,pwing,AN,BN,m,n,mtn);
+//    infcoeff(&(data->vtail),&(data->wing),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the vertical tail from the flap */
-    n+=pwing->nface;
-//    infcoeff(pvtail,pflap,AN,BN,m,n,mtn);
+    n+=(data->wing).nface;
+//    infcoeff(&(data->vtail),&(data->flap),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the vertical tail from the aileron */
-    n+=pflap->nface;
-//    infcoeff(pvtail,paileron,AN,BN,m,n,mtn);
+    n+=(data->flap).nface;
+//    infcoeff(&(data->vtail),&(data->aileron),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the vertical tail from the horizontal tail */
-    n+=paileron->nface;
-//    infcoeff(pvtail,phtail,AN,BN,m,n,mtn);
+    n+=(data->aileron).nface;
+//    infcoeff(&(data->vtail),&(data->htail),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the vertical tail from the elevator */
-    n+=phtail->nface;
-//    infcoeff(pvtail,pelevator,AN,BN,m,n,mtn);
+    n+=(data->htail).nface;
+//    infcoeff(&(data->vtail),&(data->elevator),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the vertical tail from the vertical tail */
-    n+=pelevator->nface;
-    infcoeff(pvtail,pvtail,AN,BN,m,n,mtn);
+    n+=(data->elevator).nface;
+    infcoeff(&(data->vtail),&(data->vtail),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the vertical tail from the rudder */
-    n+=pvtail->nface;
-    infcoeff(pvtail,prudder,AN,BN,m,n,mtn);
+    n+=(data->vtail).nface;
+    infcoeff(&(data->vtail),&(data->rudder),data->AN,data->BN,m,n,data->mtn);
     
-    m+=pvtail->nface;
+    m+=(data->vtail).nface;
     n=0;
     /* Influence on the rudder from the wing */
-//    infcoeff(prudder,pwing,AN,BN,m,n,mtn);
+//    infcoeff(&(data->rudder),&(data->wing),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the rudder from the flap */
-    n+=pwing->nface;
-//    infcoeff(prudder,pflap,AN,BN,m,n,mtn);
+    n+=(data->wing).nface;
+//    infcoeff(&(data->rudder),&(data->flap),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the rudder from the aileron */
-    n+=pflap->nface;
-//    infcoeff(prudder,paileron,AN,BN,m,n,mtn);
+    n+=(data->flap).nface;
+//    infcoeff(&(data->rudder),&(data->aileron),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the rudder from the horizontal tail */
-    n+=paileron->nface;
-//    infcoeff(prudder,phtail,AN,BN,m,n,mtn);
+    n+=(data->aileron).nface;
+//    infcoeff(&(data->rudder),&(data->htail),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the rudder from the elevator */
-    n+=phtail->nface;
-//    infcoeff(prudder,pelevator,AN,BN,m,n,mtn);
+    n+=(data->htail).nface;
+//    infcoeff(&(data->rudder),&(data->elevator),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the rudder from the vertical tail */
-    n+=pelevator->nface;
-    infcoeff(prudder,pvtail,AN,BN,m,n,mtn);
+    n+=(data->elevator).nface;
+    infcoeff(&(data->rudder),&(data->vtail),data->AN,data->BN,m,n,data->mtn);
     /* Influence on the rudder from the rudder */
-    n+=pvtail->nface;
-    infcoeff(prudder,prudder,AN,BN,m,n,mtn);
+    n+=(data->vtail).nface;
+    infcoeff(&(data->rudder),&(data->rudder),data->AN,data->BN,m,n,data->mtn);
 }
