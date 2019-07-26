@@ -9,7 +9,7 @@
 #include "vLiftsurf.h"
 #include <math.h>
 
-void rotateail(struct liftsurf *paileron,double delta[])
+void rotateail(struct liftsurf *paileron,double delta[2])
 {
     /* Rotate ailerons by angle delta */
     int i,j,k,nfaced2,nvertd2,te,nchordpanels,maxj;
