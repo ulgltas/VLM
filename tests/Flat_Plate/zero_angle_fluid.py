@@ -63,8 +63,8 @@ properties.vtail.geometry_file = "VTail.arp"
 
 properties.write_infile()
 
-import PyVLM
+import CVLM
 
-PyVLM.run("infile.arp","outfile.m")
+CVLM.run("infile.arp","outfile.m")
 
 tests.test("outfile.py", properties.timesteps, [0.0, 0.0, 0.0, 0.0], [0.00001, 0.00001, 0.00001, 0.00001])

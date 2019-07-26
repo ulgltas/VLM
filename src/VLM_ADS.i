@@ -4,7 +4,7 @@
 // SWIG interface file for VLM code
 // 
 
-%module PyVLM
+%module CVLM
 
 %typemap(in) (int argc, char *argv[]) {
   int i;
@@ -34,11 +34,57 @@
     #define SWIG_FILE_WITH_INIT
     #include "VLM_ADS.h"
     #include "vAirfoil.h"
+    #include "vLiftsurf.h"
+    #include "vVLMData.h"
+    #include "vSetup.h"
+    #include "vGeometrySetup.h"
+    #include "vInfluence.h"
+    #include "vIteration.h"
+    #include "vOutput.h"
+    #include "vControl.h"
+    #include "vVortex.h"
 %}
+
+%include "vLiftsurf.h"
+%include "vVLMData.h"
+
 %include "numpy.i"
+%include "typemaps.i"
 %init %{
 import_array();
 %}
+%include "carrays.i"
+%array_functions(double, Deltap)
+%array_functions(double, Deltad)
+%array_functions(double, vertices)
+%array_functions(double, vortex)
+%array_functions(double, aeroforce)
+%array_functions(int, neighbours)
+%array_functions(double, normal)
+%array_functions(int, faces)
+%array_functions(double, UVW)
+%array_functions(double, nsurf)
+%apply (double IN_ARRAY1[ANY]) {(double delta[2])}
+
+%typemap(in, numinputs = 1) char* Infile {
+  $1 = PyString_AsString($input);
+}
+%typemap(in) (struct VLMData *data) (int temp) {
+  temp = SWIG_ConvertPtr($input, (void **) &$1, $1_descriptor , 0);
+}
+
+%typemap(in) (struct liftsurf *wing) (int temp) {
+  temp = SWIG_ConvertPtr($input, (void **) &$1, $1_descriptor , 0);
+}
+
+%include "vSetup.h"
+%include "vControl.h"
+%include "vGeometrySetup.h"
+%include "vInfluence.h"
+%include "vIteration.h"
+%include "vOutput.h"
+%include "vControl.h"
+%include "vVortex.h"
 
 %apply (int DIM1, double* IN_ARRAY1) {(int len1, double* xpline)}
 %apply (int DIM1, double* ARGOUT_ARRAY1) {(int len2, double* ycamber)}

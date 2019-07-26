@@ -36,6 +36,6 @@ def properties(yaw, aileron, flap, elevator, rudder):
     properties.write_infile()
 
 def run():
-    import PyVLM
+    import CVLM
 
-    PyVLM.run("infile.arp", "outfile.m")
+    CVLM.run("infile.arp", "outfile.m")
