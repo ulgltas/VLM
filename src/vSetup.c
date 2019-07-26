@@ -109,4 +109,54 @@ void setup(char* Infile, struct VLMData *data)
 
     data->totalforce=(double *)calloc(data->ntimes*4, sizeof(double));
 }
+
+void memory_setup(struct VLMData *data)
+{
+    /* Assign memory for gamma and wind values in every liftsurf */
+    (data->wing).gamma=(double *)calloc((data->wing).nface*(data->ntimes), sizeof(double));
+    (data->wing).wind=(double *)calloc((data->wing).nface, sizeof(double));
+    (data->flap).gamma=(double *)calloc((data->flap).nface*(data->ntimes), sizeof(double));
+    (data->flap).wind=(double *)calloc((data->flap).nface, sizeof(double));
+    (data->aileron).gamma=(double *)calloc((data->aileron).nface*(data->ntimes), sizeof(double));
+    (data->aileron).wind=(double *)calloc((data->aileron).nface, sizeof(double));
+    (data->htail).gamma=(double *)calloc((data->htail).nface*(data->ntimes), sizeof(double));
+    (data->htail).wind=(double *)calloc((data->htail).nface, sizeof(double));
+    (data->elevator).gamma=(double *)calloc((data->elevator).nface*(data->ntimes), sizeof(double));
+    (data->elevator).wind=(double *)calloc((data->elevator).nface, sizeof(double));
+    (data->vtail).gamma=(double *)calloc((data->vtail).nface*(data->ntimes), sizeof(double));
+    (data->vtail).wind=(double *)calloc((data->vtail).nface, sizeof(double));
+    (data->rudder).gamma=(double *)calloc((data->rudder).nface*(data->ntimes), sizeof(double));
+    (data->rudder).wind=(double *)calloc((data->rudder).nface, sizeof(double));
+    
+    /* Assign memory AND INITIALISE uvw values in every liftsurf */
+    (data->wing).uvw=(double *)calloc((data->wing).nface * 3, sizeof(double));
+    (data->flap).uvw=(double *)calloc((data->flap).nface * 3, sizeof(double));
+    (data->aileron).uvw=(double *)calloc((data->aileron).nface * 3, sizeof(double));
+    (data->htail).uvw = (double *)calloc((data->htail).nface * 3, sizeof(double));
+    (data->elevator).uvw=(double *)calloc((data->elevator).nface * 3, sizeof(double));
+    (data->vtail).uvw = (double *)calloc((data->vtail).nface * 3, sizeof(double));
+    (data->rudder).uvw=(double *)calloc((data->rudder).nface * 3, sizeof(double));
+    
+    /* Assign memory for Deltap, Deltad and aeroforce on every liftsurf */
+    (data->wing).Deltap=(double *)malloc(sizeof(double)*(data->wing).nface);
+    (data->flap).Deltap=(double *)malloc(sizeof(double)*(data->flap).nface);
+    (data->aileron).Deltap=(double *)malloc(sizeof(double)*(data->aileron).nface);
+    (data->htail).Deltap=(double *)malloc(sizeof(double)*(data->htail).nface);
+    (data->elevator).Deltap=(double *)malloc(sizeof(double)*(data->elevator).nface);
+    (data->vtail).Deltap=(double *)malloc(sizeof(double)*(data->vtail).nface);
+    (data->rudder).Deltap=(double *)malloc(sizeof(double)*(data->rudder).nface);
+    (data->wing).Deltad=(double *)malloc(sizeof(double)*(data->wing).nface);
+    (data->flap).Deltad=(double *)malloc(sizeof(double)*(data->flap).nface);
+    (data->aileron).Deltad=(double *)malloc(sizeof(double)*(data->aileron).nface);
+    (data->htail).Deltad=(double *)malloc(sizeof(double)*(data->htail).nface);
+    (data->elevator).Deltad=(double *)malloc(sizeof(double)*(data->elevator).nface);
+    (data->vtail).Deltad=(double *)malloc(sizeof(double)*(data->vtail).nface);
+    (data->rudder).Deltad=(double *)malloc(sizeof(double)*(data->rudder).nface);
+    (data->wing).aeroforce=(double *)malloc(sizeof(double)*4);
+    (data->flap).aeroforce=(double *)malloc(sizeof(double)*4);
+    (data->aileron).aeroforce=(double *)malloc(sizeof(double)*4);
+    (data->htail).aeroforce=(double *)malloc(sizeof(double)*4);
+    (data->elevator).aeroforce=(double *)malloc(sizeof(double)*4);
+    (data->vtail).aeroforce=(double *)malloc(sizeof(double)*4);
+    (data->rudder).aeroforce=(double *)malloc(sizeof(double)*4);
 }
