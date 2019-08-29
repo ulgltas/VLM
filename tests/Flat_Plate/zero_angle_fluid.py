@@ -4,10 +4,10 @@ import pythonVLM.VLM_testing as tests
 
 airfoils = ["NACA 0001.dat", "NACA 0001.dat"]
 span = [4.0]
-taper = [1.0, 1.0]
+taper = [1.0]
 twist = [0.0, 0.0]
-sweep = [0.0, 0.0]
-dihedral = [0.0, 0.0]
+sweep = [0.0]
+dihedral = [0.0]
 root_chord = 1.0
 
 offset = [0.0, 0.0]
@@ -19,9 +19,9 @@ w = inputs.VLMWing(airfoils, span, taper, sweep, dihedral, twist, root_chord, of
 v_airfoils = ["NACA 0009.dat", "NACA 0009.dat", "NACA 0009.dat"]
 
 v_span = [0.5, 0.5]
-v_taper = [0.5, 0.5, 0.5]
-v_sweep = [45.0, 20.0, 20.0]
-v_dihedral = [0.0, 0.0, 0.0]
+v_taper = [0.5, 0.5]
+v_sweep = [45.0, 20.0]
+v_dihedral = [0.0, 0.0]
 v_twist = [0.0, 0.0, 0.0]
 v_root_chord = 0.5
 v_offset = [5.0, 6.0]
@@ -29,9 +29,9 @@ v_offset = [5.0, 6.0]
 vtail = inputs.VLMVTail(v_airfoils, v_span, v_taper, v_sweep, v_dihedral, v_twist, v_root_chord, v_offset)
 
 h_span = [1.0]
-h_taper = [0.5, 0.5]
-h_sweep = [45.0, 45.0]
-h_dihedral = [0.0, 0.0]
+h_taper = [0.5]
+h_sweep = [45.0]
+h_dihedral = [0.0]
 h_twist = [0.0, 0.0]
 h_root_chord = 0.5
 h_offset = [5.0, 6.0]
