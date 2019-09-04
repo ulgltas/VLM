@@ -33,7 +33,7 @@ void setup(char* Infile, struct VLMData *data)
     /* Create the lifting surfaces that make up the horizontal tail */
     htailsetup(&(data->htail),&(data->elevator),HTailfile,mht,nht, &ChkElev);
     /* Create the lifting surfaces that make up the vertical tail */
-    vtailsetup(&(data->vtail),&(data->rudder),VTailfile,mht,nht, &ChkRdr);
+    vtailsetup(&(data->vtail),&(data->rudder),VTailfile, mvt, nvt, &ChkRdr);
     data->dt=data->MAC/data->UVW[0]/timestep_denom; /* dt is based on the length of the wing's Mean Aerodynamic Chord */
     printf("MAC=%f, dt=%f\n",data->MAC,data->dt);
     
