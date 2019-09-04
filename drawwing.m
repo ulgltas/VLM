@@ -280,14 +280,22 @@ vtailforces=vtailDeltap(1:length(vtail.faces)/2).*vtailnsurf(1:length(vtail.face
 rudderforces=rudderDeltap(1:length(rudder.faces)/2).*ruddernsurf(1:length(rudder.faces)/2)/scalefact;
 
 quiver3(wingcp(:,1),wingcp(:,2),wingcp(:,3),wingnorm(:,1).*wingforces,wingnorm(:,2).*wingforces,wingnorm(:,3).*wingforces,0)
-quiver3(aileroncp(:,1),aileroncp(:,2),aileroncp(:,3),aileronnorm(:,1).*aileronforces,aileronnorm(:,2).*aileronforces,aileronnorm(:,3).*aileronforces,0)
-quiver3(flapcp(:,1),flapcp(:,2),flapcp(:,3),flapnorm(:,1).*flapforces,flapnorm(:,2).*flapforces,flapnorm(:,3).*flapforces,0)
-if exist('htail')
+if ~isempty(aileron.faces)
+    quiver3(aileroncp(:,1),aileroncp(:,2),aileroncp(:,3),aileronnorm(:,1).*aileronforces,aileronnorm(:,2).*aileronforces,aileronnorm(:,3).*aileronforces,0)
+end
+if ~isempty(flap.faces)
+    quiver3(flapcp(:,1),flapcp(:,2),flapcp(:,3),flapnorm(:,1).*flapforces,flapnorm(:,2).*flapforces,flapnorm(:,3).*flapforces,0)
+end
+if ~isempty(elevator.faces)
     quiver3(elevatorcp(:,1),elevatorcp(:,2),elevatorcp(:,3),elevatornorm(:,1).*elevatorforces,elevatornorm(:,2).*elevatorforces,elevatornorm(:,3).*elevatorforces,0)
+end
+if ~isempty(htail.faces)
     quiver3(htailcp(:,1),htailcp(:,2),htailcp(:,3),htailnorm(:,1).*htailforces,htailnorm(:,2).*htailforces,htailnorm(:,3).*htailforces,0)
 end
-if exist('vtail')
+if ~isempty(rudder.faces)
     quiver3(ruddercp((1:length(rudder.faces)/2),1),ruddercp((1:length(rudder.faces)/2),2),ruddercp((1:length(rudder.faces)/2),3),ruddernorm((1:length(rudder.faces)/2),1).*rudderforces,ruddernorm((1:length(rudder.faces)/2),2).*rudderforces,ruddernorm((1:length(rudder.faces)/2),3).*rudderforces,0)
+end
+if ~isempty(vtail.faces)
     quiver3(vtailcp((1:length(vtail.faces)/2),1),vtailcp((1:length(vtail.faces)/2),2),vtailcp((1:length(vtail.faces)/2),3),vtailnorm((1:length(vtail.faces)/2),1).*vtailforces,vtailnorm((1:length(vtail.faces)/2),2).*vtailforces,vtailnorm((1:length(vtail.faces)/2),3).*vtailforces,0)
 end
 title('Aerodynamic forces normal to each panel')
