@@ -64,6 +64,8 @@ class VLMSurface(wing.Wing):
         self.twist = twist
         self.x_offset = [self.offset[0]]
         self.z_offset = [self.offset[1]]
+        self.chordwise_panels = 0
+        self.spanwise_panels = 0
         j = -1
         for filename in filenames:
             m = isNACA4or5(filename)
@@ -245,6 +247,7 @@ class VLMHTail(VLMSurface):
     def initData(self, filenames, span, twist, sweep, dihedral, offset):
         VLMSurface.initData(self, filenames, span, twist, sweep, dihedral, offset)
         self.elevator = VLMControl(0, 0.0)
+        self.geometry_file = "HTail.arp"
     def write_surfaces(self, f):
         f.write("ELV201:\t{}\n".format(self.elevator.exists))
         if self.elevator.exists==1:
@@ -260,6 +263,7 @@ class VLMVTail(VLMSurface):
     def initData(self, filenames, span, twist, sweep, dihedral, offset):
         VLMSurface.initData(self, filenames, span, twist, sweep, dihedral, offset)
         self.rudder = VLMControl(0, 0.0)
+        self.geometry_file = "VTail.arp"
     def write_surfaces(self, f):
         f.write("RDR201:\t{}\n".format(self.rudder.exists))
         if self.rudder.exists==1:
