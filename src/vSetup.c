@@ -18,12 +18,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void setup_empty(struct liftsurf *pwing)
+{
+    /* Initialises the number of faces, shed panels and vertices of a liftsurf struct */
+    pwing->nface = 0;
+    pwing->nshed = 0;
+    pwing->nvert = 0;
+}
+
 void setup(char* Infile, struct VLMData *data)
 {
     int m, n, mht, nht, mvt, nvt;
     double yaw, timestep_denom;
     char Wngfile[70], HTailfile[70], VTailfile[70];
-    int ChkAil, ChkWTED, ChkElev, ChkRdr;
+    int ChkAil = 0, ChkWTED = 0, ChkElev = 0, ChkRdr = 0;
     importInputFile(Infile, (data->UVW), &(data->rho), &(data->aoa), &yaw, &m, &mht, &mvt, &n, &nht, &nvt, &(data->ntimes), &timestep_denom, &(data->freewake),
                     (data->delta), (data->beta), (data->eta), (data->zeta), Wngfile, HTailfile, VTailfile);
         
@@ -31,9 +39,26 @@ void setup(char* Infile, struct VLMData *data)
     /* Create the lifting surfaces that make up the wing */
     data->MAC=wingsetup(&(data->flap),&(data->aileron),&(data->wing),Wngfile,m,n, &ChkAil, &ChkWTED);
     /* Create the lifting surfaces that make up the horizontal tail */
-    htailsetup(&(data->htail),&(data->elevator),HTailfile,mht,nht, &ChkElev);
+    if (nht > 0)
+    {
+        htailsetup(&(data->htail),&(data->elevator),HTailfile,mht,nht, &ChkElev);
+    }
+    else /* If it is empty make the number of faces etc 0 */
+    {
+        setup_empty(&(data->htail));
+        setup_empty(&(data->elevator));
+    }
+    
     /* Create the lifting surfaces that make up the vertical tail */
-    vtailsetup(&(data->vtail),&(data->rudder),VTailfile, mvt, nvt, &ChkRdr);
+    if (nvt > 0)
+    {
+        vtailsetup(&(data->vtail),&(data->rudder),VTailfile, mvt, nvt, &ChkRdr);
+    }
+    else /* If it is empty make the number of faces etc 0 */
+    {
+        setup_empty(&(data->vtail));
+        setup_empty(&(data->rudder));
+    }
     data->dt=data->MAC/data->UVW[0]/timestep_denom; /* dt is based on the length of the wing's Mean Aerodynamic Chord */
     printf("MAC=%f, dt=%f\n",data->MAC,data->dt);
     
