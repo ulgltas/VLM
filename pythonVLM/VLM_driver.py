@@ -1,5 +1,5 @@
 import CVLM
-import math
+import numpy as np
 
 class VLMDriver(object):
     def __init__(self, infile):
@@ -11,6 +11,19 @@ class VLMDriver(object):
         CVLM.geometry_setup(self.data)
         CVLM.cycleliftsurf(self.data)
         CVLM.memory_setup(self.data)
+        self.x = np.zeros(self.data.wing.nvert)
+        self.y = np.zeros(self.data.wing.nvert)
+        self.z = np.zeros(self.data.wing.nvert)
+        self.xv = np.zeros(self.data.wing.nvert)
+        self.yv = np.zeros(self.data.wing.nvert)
+        self.zv = np.zeros(self.data.wing.nvert)
+        for ii in range(self.data.wing.nvert):
+            self.x[ii] = self.getX(ii)
+            self.y[ii] = self.getY(ii)
+            self.z[ii] = self.getZ(ii)
+            self.xv[ii] = self.getXv(ii)
+            self.yv[ii] = self.getYv(ii)
+            self.zv[ii] = self.getZv(ii)
         self.S = 0. # Surface of the wing, imperfect
         for i in range(self.data.wing.nface):
             self.S += CVLM.nsurf_getitem(self.data.wing.nsurf, i)
@@ -52,24 +65,36 @@ class VLMDriver(object):
         return self.__getCoord(index, 1)
     def getZ(self, index):
         return self.__getCoord(index, 2)
+    def getXv(self, index):
+        return self.__getVortexCoord(index, 0)
+    def getYv(self, index):
+        return self.__getVortexCoord(index, 1)
+    def getZv(self, index):
+        return self.__getVortexCoord(index, 2)
+    def setX(self, index, x):
+        self.__setCoord(index, x, 0)
+    def setY(self, index, y):
+        self.__setCoord(index, y, 1)
+    def setZ(self, index, z):
+        self.__setCoord(index, z, 2)
     def dX(self, index, dx):
         x = self.getX(index)
-        self.__setCoord(index, x+dx, 0)
+        self.__setCoord(index, self.x[index]+dx, 0)
     def dY(self, index, dy):
         y = self.getY(index)
-        self.__setCoord(index, y+dy, 1)
+        self.__setCoord(index, self.y[index]+dy, 1)
     def dZ(self, index, dz):
         z = self.getZ(index)
-        self.__setCoord(index, z+dz, 2)
+        self.__setCoord(index, self.z[index]+dz, 2)
     def dXv(self, index, dx):
         x = self.__getVortexCoord(index, 0)
-        self.__setVortexCoord(index, x+dx, 0)
+        self.__setVortexCoord(index, self.xv[index]+dx, 0)
     def dYv(self, index, dy):
         y = self.__getVortexCoord(index, 1)
-        self.__setVortexCoord(index, y+dy, 1)
+        self.__setVortexCoord(index, self.yv[index]+dy, 1)
     def dZv(self, index, dz):
         z = self.__getVortexCoord(index, 2)
-        self.__setVortexCoord(index, z+dz, 2)
+        self.__setVortexCoord(index, self.zv[index]+dz, 2)
     def getVertices(self, panel):
         v = [-1,-1,-1,-1]
         if panel < 10000:
@@ -85,13 +110,13 @@ class VLMDriver(object):
     def getCl(self):
         x_force = self.__getLoads(0)
         z_force = self.__getLoads(2)
-        lift = z_force*math.cos(self.data.aoa)-x_force*math.sin(self.data.aoa)
+        lift = z_force*np.cos(self.data.aoa)-x_force*np.sin(self.data.aoa)
         return lift/(self.getQ()*self.S)
     def getCd(self):
         x_force = self.__getLoads(0)
         z_force = self.__getLoads(2)
         induced_drag = self.__getLoads(3)
-        drag = z_force*math.sin(self.data.aoa)+x_force*math.cos(self.data.aoa)+induced_drag
+        drag = z_force*np.sin(self.data.aoa)+x_force*np.cos(self.data.aoa)+induced_drag
         return drag/(self.getQ()*self.S)
     def getdeltaP(self, panel):
         if panel < 10000:
