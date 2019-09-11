@@ -20,7 +20,7 @@ int compare_function(const void *a,const void *b) {
 int checkdoubles(double *ypos, int m)
 {
     /* Check if double entries exist in vectors */
-    int n,i,j,nj;
+    int n,i,j;
     
     n=0;
     for (i=0;i<m;i++){

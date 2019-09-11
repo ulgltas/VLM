@@ -14,7 +14,7 @@
 void colvec(struct liftsurf *pflap)
 {
     /* Calculate the collocation points and the vortex segment lengths on a lifting surface */
-    int i,j;
+    int i;
     double x1,x2,x3,x4,y1,y2,y3,y4,z1,z2,z3,z4;
     
     /* Calculate collocation points */  
@@ -49,7 +49,7 @@ void vortexblob(double uvw[], double x, double y, double z, double x1, double y1
 {
     /* Calculate the flow induced at point P(x,y,z) by a vortex blob segment with endpoints P1(x1,y1,z1) and P2(x2,y2,z2) */
     /* Inspired by the code in Katz and Plotkin */
-    double rsquared,pi,rcut,r0[3],r1[3],r2[3],ir1,ir2,r1r2[3],square,coeff,blob,epsilon;
+    double pi,rcut,r0[3],r1[3],r2[3],ir1,ir2,r1r2[3],square,coeff,blob,epsilon;
     
     pi=3.14159265358979;
     epsilon=0.1; /* Blob radius. This value seems to work very well */
@@ -93,7 +93,7 @@ void vortex(double uvw[], double x, double y, double z, double x1, double y1, do
 {
     /* Calculate the flow induced at point P(x,y,z) by a vortex segment with endpoints P1(x1,y1,z1) and P2(x2,y2,z2) */
     /* Inspired by the code in Katz and Plotkin */
-    double rsquared,pi,rcut,r0[3],r1[3],r2[3],ir1,ir2,r1r2[3],square,coeff;
+    double pi,rcut,r0[3],r1[3],r2[3],ir1,ir2,r1r2[3],square,coeff;
     
     pi=3.14159265358979;
     rcut=1.0e-11; /* Cut-off radius; if distance between point and segment smaller than this, flow is zero */

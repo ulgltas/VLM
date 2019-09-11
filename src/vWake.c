@@ -127,7 +127,7 @@ void setupwakes(struct liftsurf *pwing, int cwing)
 void createwake(struct liftsurf *pwing, double cwing, int ntimes)
 {
     /* Create wakes shed from a liftsurf */
-    int i,nwakes;
+    int i;
     
     if (pwing->nshed !=0 ){
         pwing->wakeinds=(int *)malloc(sizeof(int)*pwing->nshed);

@@ -20,12 +20,12 @@
 double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *pwing, char *Wngfile, int m, int n, int *ChkAil, int *ChkWTED)
 {
     double pi;
-    int i,j,k,nylim,mxlim,nxpos,nypos,nxyzTS;
+    int i,j,nxpos,nypos,nxyzTS;
     int mp1,np1;
     int flaphere,winghere,aileronhere;
     int flap_nvert,wing_nvert,aileron_nvert,flap_nface,wing_nface,aileron_nface;
     
-    double *ypos,*xpos,Ailypos[2],WTEDypos[2],*ylim,*xlim;
+    double *ypos,*xpos;
     double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,twistcentre,*ycamber,*ycamberall,*ycamberwgl;
     double *xv,*yv,*zv,minchord;
     double *xwing,*ywing,*zwing,*xflap,*yflap,*zflap,*xaileron,*yaileron,*zaileron,*chordvec,*levec;
@@ -34,7 +34,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     int *ijwing, *ijflap, *ijaileron;
        
     FILE *fp1;
-    int iTS, lstWngTSNumber, cond, ChkWLED, ChkWGL, WTEDStopPointsNumber, npTS, npTSp1, ndouble;
+    int iTS, lstWngTSNumber, cond, ChkWLED, ChkWGL, WTEDStopPointsNumber, ndouble;
     int Ailinds[2][2],WTEDinds[2][2],Wglinds[2][2];
     char line[110], code[8], WngArf[12], nindex[12];
     double WngTSLength[4], WngTSRtChord[4], WngTSTpChord[4], WngTSLPosFus[4], WngTSSPosFus[4], WngTSVPosFus[4];
@@ -45,7 +45,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     double AilSpan, AilPosSpan, AilArea, AilHingeRlPos,AilRlChord,AilRlSpan;
     double AilMxDDflct, AilMxUDflct, AilDDflct, AilLocSpan, AilArea_Vs_WngArea, AilSpan_Vs_WngSpan;
     double WLEDSpan, WLEDPosSpan, WLEDMxExtdChord, WLEDLocSpan, WLEDRlSpan, WLEDRlChord, WLEDSpan_Vs_WngSpan;
-    double WTEDSpan, WTEDPosSpan, WTEDHingeRlPos, WTEDRlChord, WTEDRlSpan, WTEDMxDDflct, WTEDMxUDflct, WTEDLocSpan, WTEDMxExtdChord, WTEDEfficiency;
+    double WTEDSpan, WTEDPosSpan, WTEDHingeRlPos, WTEDRlChord, WTEDRlSpan, WTEDMxDDflct, WTEDMxUDflct, WTEDLocSpan, WTEDMxExtdChord;
     double WTEDSpan_Vs_WngSpan, *WTEDStopPoint;
     double WglSpan,WglRtChord,WglTpChord,WglArea,WglSwpLE,WglDhdrl,WglLeOffset,WglTpr;
     

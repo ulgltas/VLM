@@ -152,8 +152,7 @@ void calcdistwake(struct liftsurf *pwing, struct liftsurf *pflap, int i, int cfl
 void findallwakeneighbours(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, int cwing, int cflap, int caileron)
 {
     /* Check first shed wake element to see if the different lifsurfs have coincident points */
-    int i,j;
-    double dist;
+    int i;
     
     pwing->wakecorrespwake=(int *)malloc(sizeof(int)*(pwing->nshed+pwing->nwakes));
     pflap->wakecorrespwake=(int *)malloc(sizeof(int)*(pflap->nshed+pflap->nwakes));

@@ -94,7 +94,7 @@ void normals(struct liftsurf *pflap)
 void tangentials(struct liftsurf *pflap)
 {
     /* Calculate the two unit vectors tangent to surface panels xp,yp,zp */
-    int i,j;
+    int i;
     double tx1,tx2,tx3,txall;
     double x1,x2,x3,x4,y1,y2,y3,y4,z1,z2,z3,z4;
 

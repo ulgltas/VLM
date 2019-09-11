@@ -34,9 +34,8 @@ int main(int argc, char *argv[])
 }
 void run(char *Infile, char *Outfile)
 {
-    char Wngfile[60], HTailfile[60], VTailfile[60];
     struct VLMData data;
-    int i, j, it;
+    int it;
     
     setup(Infile, &data);
     geometry_setup(&data);

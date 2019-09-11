@@ -22,13 +22,13 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     /* Set up horizontal tail */
     
     double pi;
-    int i,j,k,nylim,mxlim,nxpos,nypos,nxyzTS;
+    int i,j,nxpos,nypos,nxyzTS;
     int mp1,np1;
     int htailhere,elevatorhere;
     int htail_nvert,elevator_nvert,htail_nface,elevator_nface;
     
-    double *ypos,*xpos,ELVypos[2],*ylim,*xlim;
-    double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,twistcentre,*ycamber,*ycamberall,*ycamberwgl;
+    double *ypos,*xpos;
+    double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,twistcentre,*ycamber,*ycamberall;
     double *xv,*yv,*zv,dxw,minchord;
     double *xhtail,*yhtail,*zhtail,*xelevator,*yelevator,*zelevator,*chordvec,*levec;
     double *xvhtail,*yvhtail,*zvhtail,*xvelevator,*yvelevator,*zvelevator;
@@ -36,15 +36,14 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     int *ijhtail, *ijelevator;
        
     FILE *fp1;
-    int iTS, HTTSNumber, cond, npTS, npTSp1, ndouble;
+    int iTS, HTTSNumber, cond, npTS, ndouble;
     int ELVinds[2][2],dummyint;
-    char line[110], code[8], HTType[12], HTArf[12], HTSurfFinish[12], nindex[12];
+    char line[110], code[8], HTType[12], HTArf[12], HTSurfFinish[12];
     double HTTSLength[3], HTTSRtChord[3], HTTSTpChord[3];
-    double HTTSLPosFus[3], HTTSSPosFus[3], HTTSVPosFus[3], HTTSSwpMxRlThick[3];
     double HTTSRtInc[3], HTTSTpInc[3], HTTSSwpLE[3], HTTSDhdr[3], HTTSTwist[3], HTTSTR[3];
-    double HTSpan, HTLPosFus, HTVPosFus, HTRtChord, HTTpChord, HTArea, HTTankVol, HTSwpLE, HTTwist, HTRlInc, HTInc, HTDhdrl;
-    double HTArea_Vs_WngArea, HTAR, HTTR, HTVolCoeff;
-    double ElevSpan, ElevPosSpan, ElevGearRatio, ElevArea, ElevHingeLoc,ElevRlChord,ElevRlSpan;
+    double HTSpan, HTLPosFus, HTVPosFus, HTRtChord, HTTpChord, HTArea, HTSwpLE, HTTwist, HTRlInc, HTInc, HTDhdrl;
+    double HTAR, HTTR, HTVolCoeff;
+    double ElevSpan, ElevPosSpan, ElevArea, ElevHingeLoc,ElevRlChord,ElevRlSpan;
     double ElevMxDDflct, ElevMxUDflct, ElevRtChord, ElevTpChord, ElevSMC;
     
     /* Read Htail.arp and extract horizontal tail description */

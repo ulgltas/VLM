@@ -16,7 +16,7 @@ void readarfsize(char *WngArf,int ArfXUNumber[],int ArfXLNumber[])
 {
     /* Read size of data in airfoil file */
     FILE *fp2;
-    int cond,npoint;
+    int cond;
     char line[110],code[8];
     char* arfname=malloc(strlen(WngArf) + strlen(".arf") + 2);
     
@@ -205,9 +205,9 @@ void nacafourfivedigit(double *xpline, double *ycamber, int mp1, char WngArf[])
 void treatarfwgl(char line[], double *xpline, double *ycamber, int mp1)
 {
     /* Carries out the treatment of the airfoil on the winglet */
-    int ArfXUNumber[1],ArfXLNumber[1],j;
+    int ArfXUNumber[1],ArfXLNumber[1];
     double *ArfXU, *ArfYU, *ArfXL, *ArfYL;
-    char code[8], *WglArf, *nacanumber;
+    char *WglArf, *nacanumber;
     char *token = NULL;
     
     token = strtok(line, "\t,\n");
@@ -242,7 +242,7 @@ void treatarf(char line[], double *xpline, double *ycamber, double *ycamberall, 
     /* Carries out the treatment of the airfoils on each end of each trapezoidal section */
     int ArfXUNumber[1],ArfXLNumber[1],j;
     double *ArfXU, *ArfYU, *ArfXL, *ArfYL;
-    char code[8], *WngTSRtArf, *WngTSTpArf, *nacanumber;
+    char *WngTSRtArf, *WngTSTpArf, *nacanumber;
     char *token = NULL;
     
     token = strtok(line, "\t,\n");

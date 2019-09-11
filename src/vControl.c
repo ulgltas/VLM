@@ -13,7 +13,7 @@ void rotateail(struct liftsurf *paileron,double delta[2])
 {
     /* Rotate ailerons by angle delta */
     int i,j,k,nfaced2,nvertd2,te,nchordpanels,maxj;
-    double x1[3],x2[3],uvw[3],T[16];
+    double x1[3],x2[3],uvw[3];
     double L,sindelta[2],cosdelta[2],sqrtL;
     double u,v,w,a,b,c,u2,v2,w2;
     double x,y,z,xnew,ynew,znew,dx,dy,dz;

@@ -22,13 +22,13 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     /* Set up vertical tail */
     
     double pi;
-    int i,j,k,nylim,mxlim,nxpos,nypos,nxyzTS;
+    int i,j,nxpos,nypos,nxyzTS;
     int mp1,np1;
     int vtailhere,rudderhere;
     int vtail_nvert,rudder_nvert,vtail_nface,rudder_nface;
     
-    double *ypos,*xpos,RDRypos[2],*ylim,*xlim;
-    double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,twistcentre,*ycamber,*ycamberall;
+    double *ypos,*xpos;
+    double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,*ycamber,*ycamberall;
     double *xv,*yv,*zv,dxw,minchord;
     double *xvtail,*yvtail,*zvtail,*xrudder,*yrudder,*zrudder,*chordvec,*levec;
     double *xvvtail,*yvvtail,*zvvtail,*xvrudder,*yvrudder,*zvrudder;
@@ -36,15 +36,14 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     int *ijvtail, *ijrudder;
 
     FILE *fp1;
-    int iTS, VTTSNumber, cond, npTS, npTSp1, ndouble;
+    int iTS, VTTSNumber, cond, ndouble;
     int RDRinds[2][2],dummyint,OptVTFusMounted,OptVTTailMounted,OptVTWingMounted;
-    char line[110], code[8], VTType[12], VTArf[12], VTSurfFinish[12], nindex[12];
+    char line[110], code[8], VTType[12], VTArf[12], VTSurfFinish[12];
     double VTTSLength[2], VTTSRtChord[2], VTTSTpChord[2];
     double VTTSSwpLE[2], VTTSDhdr[2], VTTSTR[2];
-    double VTSpan, VTLPosFus, VTVPosFus, VTRtChord, VTTpChord, VTSPosFus, VTArea, VTTankVol, VTSwpLE, VTVAngle;
+    double VTSpan, VTLPosFus, VTVPosFus, VTRtChord, VTTpChord, VTSPosFus, VTArea, VTSwpLE, VTVAngle;
     double VTAR, VTTR, VTVolCoeff,VTRlTpChord,VTRlPosFus,VTRlVPosHT;
-    double VTArea_Vs_WngArea,VTRlVPosWng;
-    double RdrSpan, RdrPosSpan, RdrGearRatio, RdrArea, RdrHingeLoc,RdrRlChord,RdrRlSpan;
+    double RdrSpan, RdrPosSpan, RdrArea, RdrHingeLoc,RdrRlChord,RdrRlSpan;
     double RdrMxDDflct, RdrMxUDflct, RdrRtChord, RdrTpChord, RdrSMC;
 
     /* Read VTail.arp and extract vertical tail description */
