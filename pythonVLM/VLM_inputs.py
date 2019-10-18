@@ -123,6 +123,14 @@ class VLMSurface(wing.Wing):
             self.x_offset.append(self.pts[j][a[3],0])
             self.z_offset.append(self.pts[j][a[3],2])
         self.calculate_mac()
+    def compShape(self, span, taper, rootChord):
+        if self.n>0:
+            wing.Wing.compShape(self, span, taper, rootChord)
+        else:
+            self.chord = [rootChord]
+            self.spanPos = [0.]
+            self.b = 0.
+            self.S = 0.
     def calculate_mac(self):
         mac_integrand = 0.0 # Integrand of the mean aerodynamic chord
 
