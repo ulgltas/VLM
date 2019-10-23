@@ -45,6 +45,7 @@ void geometry_setup(struct VLMData *data)
 
 void reset_wake(struct VLMData *data)
 {
+    /* Reset wake to initial values */
     for (int i=0;i<((data->wing).nshed+(data->wing).nwakes)*data->ntimes;i++)
     {
         *((data->wing).xw+i)=0.0;
@@ -57,4 +58,53 @@ void reset_wake(struct VLMData *data)
         *((data->wing).gw+i)=0.0;
     }
     shedwake(&data->wing);
+}
+
+void reset_geometry(struct VLMData *data)
+{
+    // De-allocate normal vectors
+    free((data->flap).normal);
+    free((data->aileron).normal);
+    free((data->wing).normal);
+    free((data->htail).normal);
+    free((data->elevator).normal);
+    free((data->vtail).normal);
+    free((data->rudder).normal);
+    free((data->flap).nsurf);
+    free((data->aileron).nsurf);
+    free((data->wing).nsurf);
+    free((data->htail).nsurf);
+    free((data->elevator).nsurf);
+    free((data->vtail).nsurf);
+    free((data->rudder).nsurf);
+    // De-allocate tangential vectors
+    free((data->flap).tangx);
+    free((data->aileron).tangx);
+    free((data->wing).tangx);
+    free((data->htail).tangx);
+    free((data->elevator).tangx);
+    free((data->vtail).tangx);
+    free((data->rudder).tangx);
+    free((data->flap).tangy);
+    free((data->aileron).tangy);
+    free((data->wing).tangy);
+    free((data->htail).tangy);
+    free((data->elevator).tangy);
+    free((data->vtail).tangy);
+    free((data->rudder).tangy);
+    // De-allocate vector collocation points
+    free((data->flap).control);
+    free((data->aileron).control);
+    free((data->wing).control);
+    free((data->htail).control);
+    free((data->elevator).control);
+    free((data->vtail).control);
+    free((data->rudder).control);
+    free((data->flap).dxy);
+    free((data->aileron).dxy);
+    free((data->wing).dxy);
+    free((data->htail).dxy);
+    free((data->elevator).dxy);
+    free((data->vtail).dxy);
+    free((data->rudder).dxy);
 }

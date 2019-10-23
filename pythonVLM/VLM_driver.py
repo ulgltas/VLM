@@ -135,9 +135,10 @@ class VLMDriver(object):
             forceNormal = [comp * dP * S * weight for comp in normal]
         return forceNormal
     def update(self):
+        # After each geometry update, prepare the VLM struct for a new run
         CVLM.reset_wake(self.data)
+        CVLM.reset_geometry(self.data)
         CVLM.geometry_setup(self.data)
-        CVLM.colvec(self.data.wing)
         CVLM.cycleliftsurf(self.data)
     def save(self):
         CVLM.exportTextOutput("outfile.m",self.iteration-1,self.data)
