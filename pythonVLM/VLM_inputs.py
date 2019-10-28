@@ -4,7 +4,7 @@
 import wing
 import CVLM
 
-
+## Describe properties of a VLM calculation
 class VLMProperties:
     def __init__(self, wing, htail, vtail, infile="infile.arp"):
         self.u = 0.0
@@ -36,6 +36,7 @@ class VLMProperties:
         f.write("INP8\t{}\n".format(self.vtail.geometry_file))
         f.close()
 
+## Include aerodynamic force-generating surfaces with already existing geometry files
 class VLMDesc:
     def __init__(self, chordwise_panels, spanwise_panels, geometry_file):
         self.chordwise_panels = chordwise_panels
@@ -50,7 +51,7 @@ class VLMDesc:
     def set_rudder(self, angle=0.0):
         self.rudder = VLMControl(1, angle)
 
-
+## Describe aerodynamic force-generating surfaces
 class VLMSurface(wing.Wing):
     kind = "SUR"
     def initData(self, filenames, span, twist, sweep, dihedral, offset):
@@ -124,6 +125,7 @@ class VLMSurface(wing.Wing):
             self.z_offset.append(self.pts[j][a[3],2])
         self.calculate_mac()
     def compShape(self, span, taper, rootChord):
+        # Overloading wing compShape if the surface has no sections
         if self.n>0:
             wing.Wing.compShape(self, span, taper, rootChord)
         else:
@@ -183,7 +185,7 @@ class VLMSurface(wing.Wing):
 
         f = open(filename, "w")
         f.write("{}{}:\t{}\t-01\n".format(self.kind, self.n_airfoil, self.airfoils[0]))
-        if self.kind == "VTL":
+        if self.kind == "VTL": # Vertical tails require this line
             f.write("VTL301:\t1\t0\t0\n")
         f.write("{}{}:\t000\t{}\n".format(self.kind, self.n_sections, self.n-1))
         
@@ -217,7 +219,7 @@ class VLMSurface(wing.Wing):
         pass
 
 
-
+## Describe wing
 class VLMWing(VLMSurface):
     kind = "WNG"
     n_airfoil = 101 # Code of airfoil line
@@ -247,7 +249,7 @@ class VLMWing(VLMSurface):
             f.write("WGL601:\t0\n")
         f.write("FLA201:\t0\n")
 
-
+## Describe horizontal tail
 class VLMHTail(VLMSurface):
     kind = "HTL"
     n_airfoil = 102
@@ -263,7 +265,7 @@ class VLMHTail(VLMSurface):
             f.write("ELV603:\t{}\t{}\t{}\n".format(100.0-self.elevator.rel_chord, self.elevator.rel_chord, self.elevator.rel_span))
         f.write("ELT201: \n")
 
-
+## Describe vertical tail
 class VLMVTail(VLMSurface):
     kind = "VTL"
     n_airfoil = 102
@@ -280,7 +282,7 @@ class VLMVTail(VLMSurface):
         f.write("RDT201: \n")
 
 
-
+## Describe control surfaces (aileron, flap, rudder, elevator)
 class VLMControl:
     def __init__(self, exists, angle):
         self.angle = angle

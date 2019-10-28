@@ -28,19 +28,19 @@ class VLMDriver(object):
         for i in range(self.data.wing.nface):
             self.S += CVLM.nsurf_getitem(self.data.wing.nsurf, i)
     def run(self):
-        # Run steady simulation
+        # Run simulation until completion
         for i in range(self.data.ntimes-1):
             self.iteration = i
             CVLM.iteration(self.data, self.iteration)
     def __getCoord(self, index, delta):
         # Get the x/y/z (delta=0/1/2, respectively) of vertex index
-        if index>self.data.wing.nvert+self.data.flap.nvert:
+        if index>self.data.wing.nvert+self.data.flap.nvert: # If the vertex is on the ailerons
             c = CVLM.vertices_getitem(self.data.aileron.vertices,
                 index-self.data.wing.nvert-self.data.flap.nvert+delta*self.data.aileron.nvert)
-        elif index>self.data.wing.nvert:
+        elif index>self.data.wing.nvert: # If the vertex is on the flaps
             c = CVLM.vertices_getitem(self.data.flap.vertices,
                 index-self.data.wing.nvert+delta*self.data.flap.nvert)
-        else:
+        else: # If the vertex is on the wing
             c = CVLM.vertices_getitem(self.data.wing.vertices,
                 index+delta*self.data.wing.nvert)
         return c
@@ -97,7 +97,7 @@ class VLMDriver(object):
         self.__setVortexCoord(index, self.zv[index]+dz, 2)
     def getVertices(self, panel):
         v = [-1,-1,-1,-1]
-        if panel < 10000:
+        if panel < 10000: # If the panel is on the wing
             for j in range(4):
                 v[j] = CVLM.faces_getitem(self.data.wing.faces, panel+j*self.data.wing.nface)
         return v
@@ -125,7 +125,7 @@ class VLMDriver(object):
             dPnormal = [comp * dP for comp in normal]
         return dPnormal
     def getSurface(self, panel):
-        if panel < 10000:
+        if panel < 10000: # If the panel is on the wing
             return CVLM.nsurf_getitem(self.data.wing.nsurf, panel)
     def getForce(self, panel, weight):
         if panel < 10000:
