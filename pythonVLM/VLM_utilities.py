@@ -5,8 +5,9 @@ def create_workspace(name, origin):
     import os
     from distutils import dir_util
 
-    vlm_dir = os.path.abspath(os.path.split(__file__)[0])
-    workspace = os.path.join(vlm_dir, "..", "workspace", name)
+    temp_dir = os.path.join(os.path.split(__file__)[0], "..")
+    vlm_dir = os.path.abspath(temp_dir)
+    workspace = os.path.join(vlm_dir, "workspace", name)
     origin_models = os.path.join(vlm_dir, origin, "models")
     models = os.path.join(workspace, "models")
     if not os.path.exists(models):
