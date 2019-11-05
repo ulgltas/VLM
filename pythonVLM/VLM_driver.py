@@ -78,23 +78,28 @@ class VLMDriver(object):
     def setZ(self, index, z):
         self.__setCoord(index, z, 2)
     def dX(self, index, dx):
-        x = self.getX(index)
         self.__setCoord(index, self.x[index]+dx, 0)
     def dY(self, index, dy):
-        y = self.getY(index)
         self.__setCoord(index, self.y[index]+dy, 1)
     def dZ(self, index, dz):
-        z = self.getZ(index)
         self.__setCoord(index, self.z[index]+dz, 2)
+# Impose deformation in collocation points
+    def setXv(self, index, dx):
+        self.__setCoord(index, self.xv[index]+dx, 0)
+    def setYv(self, index, dy):
+        self.__setCoord(index, self.yv[index]+dy, 1)
+    def setZv(self, index, dz):
+        self.__setCoord(index, self.zv[index]+dz, 2)
+# Modify vortex collocation points
     def dXv(self, index, dx):
-        x = self.__getVortexCoord(index, 0)
-        self.__setVortexCoord(index, self.xv[index]+dx, 0)
+        x = self.getXv(index)
+        self.__setVortexCoord(index, x+dx, 0)
     def dYv(self, index, dy):
-        y = self.__getVortexCoord(index, 1)
-        self.__setVortexCoord(index, self.yv[index]+dy, 1)
+        y = self.getYv(index)
+        self.__setVortexCoord(index, y+dy, 1)
     def dZv(self, index, dz):
-        z = self.__getVortexCoord(index, 2)
-        self.__setVortexCoord(index, self.zv[index]+dz, 2)
+        z = self.getZv(index)
+        self.__setVortexCoord(index, z+dz, 2)
     def getVertices(self, panel):
         v = [-1,-1,-1,-1]
         if panel < 10000: # If the panel is on the wing
