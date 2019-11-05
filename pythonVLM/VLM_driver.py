@@ -85,11 +85,11 @@ class VLMDriver(object):
         self.__setCoord(index, self.z[index]+dz, 2)
 # Impose deformation in collocation points
     def setXv(self, index, dx):
-        self.__setCoord(index, self.xv[index]+dx, 0)
+        self.__setVortexCoord(index, self.xv[index]+dx, 0)
     def setYv(self, index, dy):
-        self.__setCoord(index, self.yv[index]+dy, 1)
+        self.__setVortexCoord(index, self.yv[index]+dy, 1)
     def setZv(self, index, dz):
-        self.__setCoord(index, self.zv[index]+dz, 2)
+        self.__setVortexCoord(index, self.zv[index]+dz, 2)
 # Modify vortex collocation points
     def dXv(self, index, dx):
         x = self.getXv(index)
