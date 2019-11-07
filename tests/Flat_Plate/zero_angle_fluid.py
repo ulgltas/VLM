@@ -2,7 +2,7 @@ import wing
 import pythonVLM.VLM_inputs as inputs
 import pythonVLM.VLM_testing as tests
 
-airfoils = ["NACA 0001.dat", "NACA 0001.dat"]
+airfoils = ["NACA 0001.dat", "NACA 0001.dat"] # Symmetric airfoil
 span = [4.0]
 taper = [1.0]
 twist = [0.0, 0.0]
@@ -12,10 +12,9 @@ root_chord = 1.0
 
 offset = [0.0, 0.0]
 
-spanwise_panels = 5
-
 w = inputs.VLMWing(airfoils, span, taper, sweep, dihedral, twist, root_chord, offset)
 
+# Empty VTail
 v_airfoils = []
 
 v_span = []
@@ -28,6 +27,7 @@ v_offset = [0.0, 0.0]
 
 vtail = inputs.VLMVTail(v_airfoils, v_span, v_taper, v_sweep, v_dihedral, v_twist, v_root_chord, v_offset)
 
+# Empty HTail
 h_airfoils = []
 h_span = []
 h_taper = []
