@@ -17,24 +17,24 @@
 #include <string.h>
 #include <stdlib.h>
 
-double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *pwing, char *Wngfile, int m, int n)
+double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *pwing, char *Wngfile, int m, int n, int *ChkAil, int *ChkWTED)
 {
     double pi;
-    int i,j,k,nylim,mxlim,nxpos,nypos,nxyzTS;
+    int i,j,nxpos,nypos,nxyzTS;
     int mp1,np1;
     int flaphere,winghere,aileronhere;
     int flap_nvert,wing_nvert,aileron_nvert,flap_nface,wing_nface,aileron_nface;
     
-    double *ypos,*xpos,Ailypos[2],WTEDypos[2],*ylim,*xlim;
+    double *ypos,*xpos;
     double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,twistcentre,*ycamber,*ycamberall,*ycamberwgl;
-    double *xv,*yv,*zv,dxw,minchord;
+    double *xv,*yv,*zv,minchord;
     double *xwing,*ywing,*zwing,*xflap,*yflap,*zflap,*xaileron,*yaileron,*zaileron,*chordvec,*levec;
     double *xvwing,*yvwing,*zvwing,*xvflap,*yvflap,*zvflap,*xvaileron,*yvaileron,*zvaileron;
     double zplineRt,zplineTp,twistangle,dihedral,xpTS,ypTS,zpTS;
     int *ijwing, *ijflap, *ijaileron;
        
     FILE *fp1;
-    int iTS, lstWngTSNumber, cond, ChkAil, ChkWLED, ChkWTED, ChkWGL, WTEDStopPointsNumber, npTS, npTSp1, ndouble;
+    int iTS, lstWngTSNumber, cond, ChkWLED, ChkWGL, WTEDStopPointsNumber, ndouble;
     int Ailinds[2][2],WTEDinds[2][2],Wglinds[2][2];
     char line[110], code[8], WngArf[12], nindex[12];
     double WngTSLength[4], WngTSRtChord[4], WngTSTpChord[4], WngTSLPosFus[4], WngTSSPosFus[4], WngTSVPosFus[4];
@@ -45,7 +45,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     double AilSpan, AilPosSpan, AilArea, AilHingeRlPos,AilRlChord,AilRlSpan;
     double AilMxDDflct, AilMxUDflct, AilDDflct, AilLocSpan, AilArea_Vs_WngArea, AilSpan_Vs_WngSpan;
     double WLEDSpan, WLEDPosSpan, WLEDMxExtdChord, WLEDLocSpan, WLEDRlSpan, WLEDRlChord, WLEDSpan_Vs_WngSpan;
-    double WTEDSpan, WTEDPosSpan, WTEDHingeRlPos, WTEDRlChord, WTEDRlSpan, WTEDMxDDflct, WTEDMxUDflct, WTEDLocSpan, WTEDMxExtdChord, WTEDEfficiency;
+    double WTEDSpan, WTEDPosSpan, WTEDHingeRlPos, WTEDRlChord, WTEDRlSpan, WTEDMxDDflct, WTEDMxUDflct, WTEDLocSpan, WTEDMxExtdChord;
     double WTEDSpan_Vs_WngSpan, *WTEDStopPoint;
     double WglSpan,WglRtChord,WglTpChord,WglArea,WglSwpLE,WglDhdrl,WglLeOffset,WglTpr;
     
@@ -190,14 +190,14 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
             sscanf(line,"%s %lf %lf %lf %lf %lf",code,&WngMAC,&WngMACPosX,&WngMACPosY,&WngMACPosZ,&WngMACLPosFus);
         }
         if ( strncmp("AIL201",line,6) == 0 ){
-            sscanf(line,"%s %i",code,&ChkAil);
+            sscanf(line,"%s %i",code,ChkAil);
             cond=1;
         }
     }
     cond=0;
     while(cond == 0){
         fgets(line, 110, fp1);
-        if ( ChkAil == 1 ){
+        if ( *ChkAil == 1 ){
             if ( strncmp("AIL601",line,6) == 0 ){
                 sscanf(line,"%s %lf %lf",code,&AilSpan,&AilPosSpan); /* AilPosSpan is the distance of the of inboard part of the aileron from the wing root?  */
             }
@@ -222,6 +222,12 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
             cond=1;
         }
     }
+    if (*ChkAil == 0)
+    {
+        AilSpan = 0.0;
+        AilPosSpan = 0.0;
+        AilRlChord = 0.0;
+    }
     cond=0;
     while( cond == 0 ){
         fgets(line, 110, fp1);
@@ -240,14 +246,14 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
             }
         }
         if ( strncmp("TED201",line,6) == 0 ){
-            sscanf(line,"%s %i",code,&ChkWTED);
+            sscanf(line,"%s %i",code, ChkWTED);
             cond=1;
         }
     }
     cond=0;
     while( cond == 0 ){
         fgets(line, 110, fp1);
-        if ( ChkWTED == 1 ){
+        if ( *ChkWTED == 1 ){
             if ( strncmp("TED601",line,6) == 0 ){
                 sscanf(line,"%s %lf %lf",code,&WTEDSpan,&WTEDPosSpan);
             }
@@ -285,6 +291,16 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
             cond=1;
         }        
     }
+    if (*ChkWTED == 1)
+    {
+        free(WTEDStopPoint);
+    }
+    if (*ChkWTED == 0)
+    {
+        WTEDSpan = 0.0;
+        WTEDPosSpan = 0.0;
+        WTEDRlChord = 0.0;
+    }
     while(fgets(line, 110, fp1) != NULL){
         if ( ChkWGL == 1 ){
             if ( strncmp("WGL601",line,6) == 0 ){
@@ -308,15 +324,26 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
             minchord=WngTSTpChord[i];
         }
     }
-    nypos=lstWngTSNumber+5;
-    nxpos=4;
+    nypos=lstWngTSNumber+1;
+    nxpos=2;
     nxyzTS=lstWngTSNumber+1;
+    if (*ChkAil == 1)
+    {
+        nypos++;
+        nxpos++;
+    }
+    if (*ChkWTED == 1)
+    {
+        nypos++;
+        nxpos++;
+    }
+
     if (  ChkWGL == 1){
         WglLeOffset=0.01;
         WglSwpLE=WglSwpLE*pi/180.0;
         WglDhdrl=WglDhdrl*pi/180.0;
-        nypos=lstWngTSNumber+6;
-        nxpos=6;
+        nypos+=3; // Three panels in the winglet
+        nxpos+=2;
         nxyzTS=lstWngTSNumber+2;
         WglTpr=WglTpChord/WglRtChord; /* Winglet taper ratio */
     }
@@ -335,10 +362,17 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
         *(xTS+i)=WngTSLength[i-1]*tan(WngTSSwpLE[i-1])+*(xTS+i-1);
         *(zTS+i)=sin(WngTSDhdr[i-1])*WngTSLength[i-1]+*(zTS+i-1);
     }
-    *(ypos+i)=WTEDPosSpan;i++;
-    *(ypos+i)=WTEDSpan+WTEDPosSpan;i++;
-    *(ypos+i)=AilPosSpan;i++;
-    *(ypos+i)=AilSpan+AilPosSpan;i++;
+    if (*ChkWTED == 1)
+    {
+        *(ypos + i) = WTEDPosSpan; i++;
+        *(ypos + i) = WTEDSpan + WTEDPosSpan; i++;
+    }
+    if (*ChkAil == 1)
+    {
+        *(ypos + i) = AilPosSpan; i++;
+        *(ypos + i) = AilSpan + AilPosSpan; i++;
+    }
+    
     if (  ChkWGL == 1){
         *(ypos+i)=*(yTS+lstWngTSNumber)+WglSpan;
         *(yTS+lstWngTSNumber+1)=*(ypos+i);
@@ -358,26 +392,51 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     if (n <= nypos){
         fprintf(stderr,"Error:  The number of spanwise panels on the wing should be larger than %i\n",nypos);
         exit(1);
-    }    
+    }
     /* Create vector containing the full spanwise grid */
     createypline(ypos,nypos,ypline,np1);
+    free(ypos);
     /* Check between which elements of ypline lie the aileron, flap and winglet */
-    WTEDinds[0][1]=findindex(ypline,np1,WTEDPosSpan);
-    WTEDinds[1][1]=findindex(ypline,np1,WTEDSpan+WTEDPosSpan);
-    Ailinds[0][1]=findindex(ypline,np1,AilPosSpan);
-    Ailinds[1][1]=findindex(ypline,np1,AilSpan+AilPosSpan);
-    Wglinds[0][1]=findindex(ypline,np1,*(yTS+lstWngTSNumber));
-    Wglinds[1][1]=findindex(ypline,np1,*(yTS+lstWngTSNumber)+WglSpan);
+
+    if (*ChkWTED == 1)
+    {
+        WTEDinds[0][1] = findindex(ypline, np1, WTEDPosSpan);
+        WTEDinds[1][1] = findindex(ypline, np1, WTEDSpan + WTEDPosSpan);
+    }
+    
+    if (*ChkAil == 1)
+    {
+        Ailinds[0][1] = findindex(ypline, np1, AilPosSpan);
+        Ailinds[1][1] = findindex(ypline, np1, AilSpan + AilPosSpan);
+    }
+    
+    if (ChkWGL == 1)
+    {
+        Wglinds[0][1] = findindex(ypline, np1, *(yTS + lstWngTSNumber));
+        Wglinds[1][1] = findindex(ypline, np1, *(yTS + lstWngTSNumber) + WglSpan);
+    }
     
     /* Create vector containing y-coords of TS, Ail, WTED and Wgl */
-    xpos= (double *)malloc(sizeof(double)*nxpos); 
-    *(xpos+0)=0.0;
-    *(xpos+1)=(100.0-WTEDRlChord)/100.0;
-    *(xpos+2)=(100.0-AilRlChord)/100.0;
-    *(xpos+3)=1.0;
+    xpos= (double *)malloc(sizeof(double)*nxpos);
+    i=0;
+    *(xpos+i)=0.0;
+    if (*ChkWTED == 1)
+    {
+        i++;
+        *(xpos+i)=(100.0-WTEDRlChord)/100.0;
+    }
+    if (*ChkAil == 1)
+    {
+        i++;
+        *(xpos+i)=(100.0-AilRlChord)/100.0;
+    }
+    i++;
+    *(xpos+i)=1.0;
     if (  ChkWGL == 1){
-        *(xpos+4)=WglLeOffset/ WngTSTpChord[lstWngTSNumber-1];
-        *(xpos+5)=(WglLeOffset+WglRtChord)/ WngTSTpChord[lstWngTSNumber-1];
+        i++;
+        *(xpos+i)=WglLeOffset/ WngTSTpChord[lstWngTSNumber-1];
+        i++;
+        *(xpos+i)=(WglLeOffset+WglRtChord)/ WngTSTpChord[lstWngTSNumber-1];
     }
     /* Sort xpos vector */
     qsort(xpos, nxpos, sizeof(double), compare_function);
@@ -396,13 +455,18 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     }
     /* Create vector containing the full spanwise grid */
     createypline(xpos,nxpos,xpline,mp1);
+    free(xpos);
     /* Check between which elements of ypline lie the aileron, flap and winglet */
     WTEDinds[0][0]=findindex(xpline,mp1,(100.0-WTEDRlChord)/100.0);
     WTEDinds[1][0]=m; /* Will always lie on the trailing edge */
     Ailinds[0][0]=findindex(xpline,mp1,(100.0-AilRlChord)/100.0);
     Ailinds[1][0]=m; /* Will always lie on the trailing edge */
-    Wglinds[0][0]=findindex(xpline,mp1,WglLeOffset/ WngTSTpChord[lstWngTSNumber-1]);
-    Wglinds[1][0]=findindex(xpline,mp1,(WglLeOffset+WglRtChord)/ WngTSTpChord[lstWngTSNumber-1]);
+    if (ChkWGL==1)
+    {
+        Wglinds[0][0] = findindex(xpline, mp1, WglLeOffset / WngTSTpChord[lstWngTSNumber - 1]);
+        Wglinds[1][0] = findindex(xpline, mp1, (WglLeOffset + WglRtChord) / WngTSTpChord[lstWngTSNumber - 1]);
+    }
+    
 
     /* Create matrix of non-dimensional camber lines */
     rewind(fp1);
@@ -474,11 +538,17 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
                 *(zpgrid+i+j*mp1)=(zplineTp-zplineRt)/WglSpan*(yhere-*(yTS+iTS))+zplineRt;
             }
         }
-    }    
-    
+    }
+    free(xpline);
+    free(chordvec);
+    free(levec);
+    free(ycamber);
+    free(ycamberwgl);
+    free(ycamberall);
+    free(xTS);
     /* wake shedding distance */
-    dxw=0.3*minchord/m;
-    vortexpanel(xv,yv,zv,xpgrid,ypgrid,zpgrid,dxw,m,n);  
+    pwing->dxw=0.3*minchord/m;
+    vortexpanel(xv,yv,zv,xpgrid,ypgrid,zpgrid,pwing->dxw,m,n);  
          
     /* Assign wing grid cells to wing, aileron and flap */
     xwing= (double *)malloc(sizeof(double)*mp1*np1); 
@@ -524,31 +594,47 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
             winghere=0;
             aileronhere=0;
             /* Check if this point lies on the flap */
-            if (i >= WTEDinds[0][0] && i <= WTEDinds[1][0] && j >= WTEDinds[0][1] && j <= WTEDinds[1][1]){ /* Flap */
-                flaphere=1;
-                if (i == WTEDinds[0][0]){ /* Flap leading edge */
-                    winghere=1;
-                }
-                if (j == WTEDinds[0][1]){ /* Flap inboard edge */
-                    winghere=1;
-                }
-                if (j == WTEDinds[1][1]){ /* Flap outboard edge */
-                    winghere=1;
+            if (*ChkWTED == 1)
+            {
+                if (i >= WTEDinds[0][0] && i <= WTEDinds[1][0] && j >= WTEDinds[0][1] && j <= WTEDinds[1][1])
+                { /* Flap */
+                    flaphere = 1;
+                    if (i == WTEDinds[0][0])
+                    { /* Flap leading edge */
+                        winghere = 1;
+                    }
+                    if (j == WTEDinds[0][1])
+                    { /* Flap inboard edge */
+                        winghere = 1;
+                    }
+                    if (j == WTEDinds[1][1])
+                    { /* Flap outboard edge */
+                        winghere = 1;
+                    }
                 }
             }
+
             /* Check if this point lies on the aileron */
-            if (i >= Ailinds[0][0] && i <= Ailinds[1][0] && j >= Ailinds[0][1] && j <= Ailinds[1][1]){ /* Aileron */
-                aileronhere=1;
-                if (i == Ailinds[0][0]){ /* Aileron leading edge */
-                    winghere=1;
-                }
-                if (j == Ailinds[0][1]){ /* Aileron inboard edge */
-                    winghere=1;
-                }
-                if (j == Ailinds[1][1]){ /* Aileron outboard edge */
-                    winghere=1;
+            if (*ChkAil == 1)
+            {
+                if (i >= Ailinds[0][0] && i <= Ailinds[1][0] && j >= Ailinds[0][1] && j <= Ailinds[1][1])
+                { /* Aileron */
+                    aileronhere = 1;
+                    if (i == Ailinds[0][0])
+                    { /* Aileron leading edge */
+                        winghere = 1;
+                    }
+                    if (j == Ailinds[0][1])
+                    { /* Aileron inboard edge */
+                        winghere = 1;
+                    }
+                    if (j == Ailinds[1][1])
+                    { /* Aileron outboard edge */
+                        winghere = 1;
+                    }
                 }
             }
+
             /* Check if this point lies on the wiglet */
             if (  ChkWGL == 1){
                 if (i >= Wglinds[0][0] && i <= Wglinds[1][0] && j >= Wglinds[0][1] && j <= Wglinds[1][1]){ /* Aileron */
@@ -635,7 +721,16 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
             }
         }
     }    
-    
+    free(ypline);
+    free(xv);
+    free(yv);
+    free(zv);
+    free(xpgrid);
+    free(ypgrid);
+    free(zpgrid);
+    free(yTS);
+    free(yTS2);
+    free(zTS);
     /* Count number of panels on all halves of lifting surfaces */
     flap_nface=countfaces(ijflap,flap_nvert,mp1,np1);
     aileron_nface=countfaces(ijaileron,aileron_nvert,mp1,np1); 
@@ -647,25 +742,42 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     pflap->faces=(int *)malloc(sizeof(int)*pflap->nface*4); 
     pflap->shedding=(int *)malloc(sizeof(int)*pflap->nface); 
     arrangefaces(ijflap,mp1,np1,pflap);  
-
+    free(ijflap);
     /* Create all the panel information in the aileron liftsurf structure */
     paileron->nface=2*aileron_nface;
     paileron->nvert=2*aileron_nvert;
     paileron->faces=(int *)malloc(sizeof(int)*paileron->nface*4); 
     paileron->shedding=(int *)malloc(sizeof(int)*paileron->nface); 
     arrangefaces(ijaileron,mp1,np1,paileron);
-    
+    free(ijaileron);
     /* Create all the panel information in the wing liftsurf structure */
     pwing->nface=2*wing_nface;
     pwing->nvert=2*wing_nvert;
     pwing->faces=(int *)malloc(sizeof(int)*pwing->nface*4); 
     pwing->shedding=(int *)malloc(sizeof(int)*pwing->nface); 
     arrangefaces(ijwing,mp1,np1,pwing);
-
+    free(ijwing);
     /* Copy all panel vertex information to the relevant liftsurf structures */
     assignvertices(pflap,xflap,yflap,zflap,xvflap,yvflap,zvflap);
+    free(xflap);
+    free(yflap);
+    free(zflap);
+    free(xvflap);
+    free(yvflap);
+    free(zvflap);
     assignvertices(paileron,xaileron,yaileron,zaileron,xvaileron,yvaileron,zvaileron);
-    assignvertices(pwing,xwing,ywing,zwing,xvwing,yvwing,zvwing);     
-    
+    free(xaileron);
+    free(yaileron);
+    free(zaileron);
+    free(xvaileron);
+    free(yvaileron);
+    free(zvaileron);
+    assignvertices(pwing,xwing,ywing,zwing,xvwing,yvwing,zvwing);
+    free(xwing);
+    free(ywing);
+    free(zwing);
+    free(xvwing);
+    free(yvwing);
+    free(zvwing);
     return WngMAC;
 }

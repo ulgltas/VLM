@@ -17,18 +17,18 @@
 #include <string.h>
 #include <stdlib.h>
 
-void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTailfile, int m, int n)
+void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTailfile, int m, int n, int *ChkElev)
 {
     /* Set up horizontal tail */
     
     double pi;
-    int i,j,k,nylim,mxlim,nxpos,nypos,nxyzTS;
+    int i,j,nxpos,nypos,nxyzTS;
     int mp1,np1;
     int htailhere,elevatorhere;
     int htail_nvert,elevator_nvert,htail_nface,elevator_nface;
     
-    double *ypos,*xpos,ELVypos[2],*ylim,*xlim;
-    double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,twistcentre,*ycamber,*ycamberall,*ycamberwgl;
+    double *ypos,*xpos;
+    double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,twistcentre,*ycamber,*ycamberall;
     double *xv,*yv,*zv,dxw,minchord;
     double *xhtail,*yhtail,*zhtail,*xelevator,*yelevator,*zelevator,*chordvec,*levec;
     double *xvhtail,*yvhtail,*zvhtail,*xvelevator,*yvelevator,*zvelevator;
@@ -36,15 +36,14 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     int *ijhtail, *ijelevator;
        
     FILE *fp1;
-    int iTS, HTTSNumber, cond, ChkElev, npTS, npTSp1, ndouble;
+    int iTS, HTTSNumber, cond, npTS, ndouble;
     int ELVinds[2][2],dummyint;
-    char line[110], code[8], HTType[12], HTArf[12], HTSurfFinish[12], nindex[12];
+    char line[110], code[8], HTType[12], HTArf[12], HTSurfFinish[12];
     double HTTSLength[3], HTTSRtChord[3], HTTSTpChord[3];
-    double HTTSLPosFus[3], HTTSSPosFus[3], HTTSVPosFus[3], HTTSSwpMxRlThick[3];
     double HTTSRtInc[3], HTTSTpInc[3], HTTSSwpLE[3], HTTSDhdr[3], HTTSTwist[3], HTTSTR[3];
-    double HTSpan, HTLPosFus, HTVPosFus, HTRtChord, HTTpChord, HTArea, HTTankVol, HTSwpLE, HTTwist, HTRlInc, HTInc, HTDhdrl;
-    double HTArea_Vs_WngArea, HTAR, HTTR, HTVolCoeff;
-    double ElevSpan, ElevPosSpan, ElevGearRatio, ElevArea, ElevHingeLoc,ElevRlChord,ElevRlSpan;
+    double HTSpan, HTLPosFus, HTVPosFus, HTRtChord, HTTpChord, HTArea, HTSwpLE, HTTwist, HTRlInc, HTInc, HTDhdrl;
+    double HTAR, HTTR, HTVolCoeff;
+    double ElevSpan, ElevPosSpan, ElevArea, ElevHingeLoc,ElevRlChord,ElevRlSpan;
     double ElevMxDDflct, ElevMxUDflct, ElevRtChord, ElevTpChord, ElevSMC;
     
     /* Read Htail.arp and extract horizontal tail description */
@@ -139,14 +138,14 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
             sscanf(line,"%s %lf %lf %lf",code,&HTAR,&HTTR,&HTVolCoeff);
         }
         if ( strncmp("ELV201",line,6) == 0 ){
-            sscanf(line,"%s %i",code,&ChkElev);
+            sscanf(line,"%s %i",code, ChkElev);
             cond=1;
         }
     }
     cond=0;
     while(cond == 0){
         fgets(line, 110, fp1);
-        if ( ChkElev == 1 ){
+        if ( *ChkElev == 1 ){
             if ( strncmp("ELV601",line,6) == 0 ){
                 sscanf(line,"%s %lf %lf",code,&ElevSpan,&ElevPosSpan);
             }
@@ -181,8 +180,14 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
         }
     }
     
-    nypos=HTTSNumber+3;
-    nxpos=3;
+    nypos=HTTSNumber+1;
+    nxpos=2;
+    if (*ChkElev == 1)
+    {
+        nypos += 2;
+        nxpos++;
+    }
+    
     nxyzTS=HTTSNumber+1;
     /* Create vector containing y-coords of TS and Elev */
     ypos= (double *)malloc(sizeof(double)*nypos); 
@@ -198,8 +203,13 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
         *(xTS+i)=HTTSLength[i-1]*tan(HTTSSwpLE[i-1])+*(xTS+i-1);
         *(zTS+i)=sin(HTTSDhdr[i-1])*HTTSLength[i-1]+*(zTS+i-1);
     }
-    *(ypos+i)=ElevPosSpan;i++;
-    *(ypos+i)=ElevSpan/2.0+ElevPosSpan; /* ElevSpan is the total elevator span */
+    if (*ChkElev == 1)
+    {
+        *(ypos+i)=ElevPosSpan;i++;
+        *(ypos+i)=ElevSpan/2.0+ElevPosSpan; /* ElevSpan is the total elevator span */
+    }
+    
+    
     
     /* Sort ypos vector */
     qsort(ypos, nypos, sizeof(double), compare_function);
@@ -217,6 +227,7 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     }    
     /* Create vector containing the full spanwise grid */
     createypline(ypos,nypos,ypline,np1);
+    free(ypos);
     /* Check between which elements of ypline lies the elevator */    
     ELVinds[0][1]=findindex(ypline,np1,ElevPosSpan);
     ELVinds[1][1]=findindex(ypline,np1,ElevSpan/2+ElevPosSpan);
@@ -224,8 +235,13 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     /* Create vector containing x-coords of TS and Elev */
     xpos= (double *)malloc(sizeof(double)*nxpos); 
     *(xpos+0)=0.0;
-    *(xpos+1)=(100.0-ElevRlChord)/100.0;
-    *(xpos+2)=1.0;
+    i = 1;
+    if (*ChkElev == 1)
+    {
+        *(xpos+1)=(100.0-ElevRlChord)/100.0;
+        i++;
+    }
+    *(xpos+i)=1.0;
     /* Sort xpos vector */
     qsort(xpos, nxpos, sizeof(double), compare_function);
     /* Remove repeated values from ypos vector */   
@@ -243,9 +259,13 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     }
     /* Create vector containing the full spanwise grid */
     createypline(xpos,nxpos,xpline,mp1);
+    free(xpos);
     /* Check between which elements of xpline lies the elevator */
-    ELVinds[0][0]=findindex(xpline,mp1,(100.0-ElevRlChord)/100.0);
-    ELVinds[1][0]=m; /* Will always lie on the trailing edge */    
+    if (*ChkElev == 1)
+    {
+        ELVinds[0][0]=findindex(xpline,mp1,(100.0-ElevRlChord)/100.0);
+        ELVinds[1][0]=m; /* Will always lie on the trailing edge */
+    }
 
     /* Create matrix of non-dimensional camber lines */
     rewind(fp1);
@@ -297,8 +317,13 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
             zplineTp=*(ycamberall+i+(2*iTS+1)*mp1)*HTTSTpChord[iTS]; /* Tip camber line of trapezoidal section */
             *(zpgrid+i+j*mp1)=(zplineTp-zplineRt)/HTTSLength[iTS]*(yhere-*(yTS+iTS))+zplineRt;
         }
-    }    
-
+    }
+    free(xpline);
+    free(chordvec);
+    free(levec);
+    free(ycamber);
+    free(ycamberall);
+    free(xTS);
     /* wake shedding distance */
     dxw=0.3*minchord/m;
     vortexpanel(xv,yv,zv,xpgrid,ypgrid,zpgrid,dxw,m,n);  
@@ -339,7 +364,7 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
             htailhere=0;
             elevatorhere=0;
             /* Check if this point lies on the elevator */
-            if (i >= ELVinds[0][0] && i <= ELVinds[1][0] && j >= ELVinds[0][1] && j <= ELVinds[1][1]){ /* Elevator */
+            if (*ChkElev == 1 && i >= ELVinds[0][0] && i <= ELVinds[1][0] && j >= ELVinds[0][1] && j <= ELVinds[1][1]){ /* Elevator */
                 elevatorhere=1;
                 if (i == ELVinds[0][0]){ /* Elevator leading edge */
                     htailhere=1;
@@ -407,8 +432,17 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
                 *(ijhtail+mp1*np1+htail_nvert-1)=j;
             }
         }
-    }     
-
+    }
+    free(ypline);
+    free(xv);
+    free(yv);
+    free(zv);
+    free(xpgrid);
+    free(ypgrid);
+    free(zpgrid);
+    free(yTS);
+    free(yTS2);
+    free(zTS);
     /* Count number of panels on all halves of lifting surfaces */
     elevator_nface=countfaces(ijelevator,elevator_nvert,mp1,np1);
     htail_nface=countfaces(ijhtail,htail_nvert,mp1,np1);   
@@ -419,15 +453,27 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     pelevator->faces=(int *)malloc(sizeof(int)*pelevator->nface*4); 
     pelevator->shedding=(int *)malloc(sizeof(int)*pelevator->nface); 
     arrangefaces(ijelevator,mp1,np1,pelevator);  
-    
+    free(ijelevator);
     /* Create all the panel information in the htail liftsurf structure */
     phtail->nface=2*htail_nface;
     phtail->nvert=2*htail_nvert;
     phtail->faces=(int *)malloc(sizeof(int)*phtail->nface*4); 
     phtail->shedding=(int *)malloc(sizeof(int)*phtail->nface); 
     arrangefaces(ijhtail,mp1,np1,phtail);
-
+    free(ijhtail);
     /* Copy all panel vertex information to the relevant liftsurf structures */
     assignvertices(pelevator,xelevator,yelevator,zelevator,xvelevator,yvelevator,zvelevator);
-    assignvertices(phtail,xhtail,yhtail,zhtail,xvhtail,yvhtail,zvhtail);     
+    free(xelevator);
+    free(yelevator);
+    free(zelevator);
+    free(xvelevator);
+    free(yvelevator);
+    free(zvelevator);
+    assignvertices(phtail,xhtail,yhtail,zhtail,xvhtail,yvhtail,zvhtail);
+    free(xhtail);
+    free(yhtail);
+    free(zhtail);
+    free(xvhtail);
+    free(yvhtail);
+    free(zvhtail);
 }

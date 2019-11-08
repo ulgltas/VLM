@@ -51,7 +51,7 @@ void arrangefaces(int *ijflap, int mp1, int np1, struct liftsurf *pflap)
      * ijflap contains the indices from the complete wing grid that
      * lie in the current lifting surface.*/
     
-    int nfaces, nfaced2, nvertd2, i, i1, j1, k, condij[3],nte;
+    int nfaces, nfaced2, nvertd2, i, i1, j1, k, condij[3];
     
     nfaced2=pflap->nface/2;
     nvertd2=pflap->nvert/2;

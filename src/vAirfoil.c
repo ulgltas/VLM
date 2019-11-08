@@ -16,7 +16,7 @@ void readarfsize(char *WngArf,int ArfXUNumber[],int ArfXLNumber[])
 {
     /* Read size of data in airfoil file */
     FILE *fp2;
-    int cond,npoint;
+    int cond;
     char line[110],code[8];
     char* arfname=malloc(strlen(WngArf) + strlen(".arf") + 2);
     
@@ -30,7 +30,8 @@ void readarfsize(char *WngArf,int ArfXUNumber[],int ArfXLNumber[])
         fprintf(stderr,"Error:  Could not open file %s\n",arfname);
         exit(1);
     }
-    
+    // Deallocate memory
+    free(arfname);
     /* Scan the file until lines GMD401 and GMD402 to read the number of points on the two surfaces */
     cond=0;
     while (cond == 0){
@@ -67,7 +68,8 @@ void readarf(char *WngArf,double *ArfXU, double *ArfYU, double *ArfXL,double *Ar
         fprintf(stderr,"Error:  Could not open file %s\n",arfname);
         exit(1);
     }
-    
+    // Deallocate memory
+    free(arfname);
     /* Scan the file until lines GMD15 to read the upper and lower surface data */
     fgets(line, 110, fp2);
     cond=0;
@@ -203,9 +205,9 @@ void nacafourfivedigit(double *xpline, double *ycamber, int mp1, char WngArf[])
 void treatarfwgl(char line[], double *xpline, double *ycamber, int mp1)
 {
     /* Carries out the treatment of the airfoil on the winglet */
-    int ArfXUNumber[1],ArfXLNumber[1],j;
+    int ArfXUNumber[1],ArfXLNumber[1];
     double *ArfXU, *ArfYU, *ArfXL, *ArfYL;
-    char code[8], *WglArf, *nacanumber;
+    char *WglArf, *nacanumber;
     char *token = NULL;
     
     token = strtok(line, "\t,\n");
@@ -227,6 +229,11 @@ void treatarfwgl(char line[], double *xpline, double *ycamber, int mp1)
         readarf(WglArf,ArfXU,ArfYU,ArfXL,ArfYL,ArfXUNumber,ArfXLNumber);
         /* Interpolate airfoil at the desired coordinates xpline */
         interparf(ycamber,ArfXU,ArfYU,ArfXL,ArfYL,ArfXUNumber,ArfXLNumber,xpline,mp1);
+        // Deallocate
+        free(ArfXU);
+        free(ArfYU);
+        free(ArfXL);
+        free(ArfYL);
     }
 }
 
@@ -235,7 +242,7 @@ void treatarf(char line[], double *xpline, double *ycamber, double *ycamberall, 
     /* Carries out the treatment of the airfoils on each end of each trapezoidal section */
     int ArfXUNumber[1],ArfXLNumber[1],j;
     double *ArfXU, *ArfYU, *ArfXL, *ArfYL;
-    char code[8], *WngTSRtArf, *WngTSTpArf, *nacanumber;
+    char *WngTSRtArf, *WngTSTpArf, *nacanumber;
     char *token = NULL;
     
     token = strtok(line, "\t,\n");
@@ -261,6 +268,11 @@ void treatarf(char line[], double *xpline, double *ycamber, double *ycamberall, 
         readarf(WngTSRtArf,ArfXU,ArfYU,ArfXL,ArfYL,ArfXUNumber,ArfXLNumber);
         /* Interpolate airfoil at the desired coordinates xpline */
         interparf(ycamber,ArfXU,ArfYU,ArfXL,ArfYL,ArfXUNumber,ArfXLNumber,xpline,mp1);
+        // Deallocate
+        free(ArfXU);
+        free(ArfYU);
+        free(ArfXL);
+        free(ArfYL);
         for (j=0;j<mp1;j++){
             *(ycamberall+j+2*iTS*mp1)=*(ycamber+j);
         }
@@ -285,6 +297,11 @@ void treatarf(char line[], double *xpline, double *ycamber, double *ycamberall, 
         readarf(WngTSTpArf,ArfXU,ArfYU,ArfXL,ArfYL,ArfXUNumber,ArfXLNumber);
         /* Interpolate airfoil at the desired coordinates xpline */
         interparf(ycamber,ArfXU,ArfYU,ArfXL,ArfYL,ArfXUNumber,ArfXLNumber,xpline,mp1);
+        // Deallocate
+        free(ArfXU);
+        free(ArfYU);
+        free(ArfXL);
+        free(ArfYL);
         for (j=0;j<mp1;j++){
             *(ycamberall+j+(2*iTS+1)*mp1)=*(ycamber+j);
         }

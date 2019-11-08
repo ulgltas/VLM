@@ -7,8 +7,9 @@
 
 #include "vRHS.h"
 #include "vLiftsurf.h"
+#include "vVLMData.h"
 
-void calcRHS(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *phtail, struct liftsurf *pelevator, struct liftsurf *pvtail, struct liftsurf *prudder, double *RHS, double UVW[])
+void calcRHS(struct VLMData *data)
 {   
     /* Calculate the Right Hand Side vector */
     /* Cycle through the lifting surfaces in the order wing, flap, aileron, horizontal tail, elevator */
@@ -16,38 +17,38 @@ void calcRHS(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *pa
     int i,m;
 
     m=0;
-    for (i=0; i < pwing->nface; i++){
-        *(RHS+i)=-(*(pwing->uvw+i)+UVW[0])* *(pwing->normal+i)-(*(pwing->uvw+i+pwing->nface)+UVW[1])* *(pwing->normal+i+pwing->nface) -
-                (*(pwing->uvw+i+2*pwing->nface)+UVW[2])* *(pwing->normal+i+2*pwing->nface);
+    for (i=0; i < (data->wing).nface; i++){
+        *((data->RHS)+i)=-(*((data->wing).uvw+i)+data->UVW[0])* *((data->wing).normal+i)-(*((data->wing).uvw+i+(data->wing).nface)+data->UVW[1])* *((data->wing).normal+i+(data->wing).nface) -
+                (*((data->wing).uvw+i+2*(data->wing).nface)+data->UVW[2])* *((data->wing).normal+i+2*(data->wing).nface);
     }
-    m+=pwing->nface;
-    for (i=0; i < pflap->nface; i++){
-        *(RHS+i+m)=-(*(pflap->uvw+i)+UVW[0])* *(pflap->normal+i)-(*(pflap->uvw+i+pflap->nface)+UVW[1])* *(pflap->normal+i+pflap->nface) -
-                (*(pflap->uvw+i+2*pflap->nface)+UVW[2])* *(pflap->normal+i+2*pflap->nface);
+    m+=(data->wing).nface;
+    for (i=0; i < (data->flap).nface; i++){
+        *((data->RHS)+i+m)=-(*((data->flap).uvw+i)+data->UVW[0])* *((data->flap).normal+i)-(*((data->flap).uvw+i+(data->flap).nface)+data->UVW[1])* *((data->flap).normal+i+(data->flap).nface) -
+                (*((data->flap).uvw+i+2*(data->flap).nface)+data->UVW[2])* *((data->flap).normal+i+2*(data->flap).nface);
     }
-    m+=pflap->nface;
-    for (i=0; i < paileron->nface; i++){
-        *(RHS+i+m)=-(*(paileron->uvw+i)+UVW[0])* *(paileron->normal+i)-(*(paileron->uvw+i+paileron->nface)+UVW[1])* *(paileron->normal+i+paileron->nface) -
-                (*(paileron->uvw+i+2*paileron->nface)+UVW[2])* *(paileron->normal+i+2*paileron->nface);
+    m+=(data->flap).nface;
+    for (i=0; i < (data->aileron).nface; i++){
+        *((data->RHS)+i+m)=-(*((data->aileron).uvw+i)+data->UVW[0])* *((data->aileron).normal+i)-(*((data->aileron).uvw+i+(data->aileron).nface)+data->UVW[1])* *((data->aileron).normal+i+(data->aileron).nface) -
+                (*((data->aileron).uvw+i+2*(data->aileron).nface)+data->UVW[2])* *((data->aileron).normal+i+2*(data->aileron).nface);
     }
-    m+=paileron->nface;
-    for (i=0; i < phtail->nface; i++){
-        *(RHS+i+m)=-(*(phtail->uvw+i)+UVW[0])* *(phtail->normal+i)-(*(phtail->uvw+i+phtail->nface)+UVW[1])* *(phtail->normal+i+phtail->nface) -
-                (*(phtail->uvw+i+2*phtail->nface)+UVW[2])* *(phtail->normal+i+2*phtail->nface);
+    m+=(data->aileron).nface;
+    for (i=0; i < (data->htail).nface; i++){
+        *((data->RHS)+i+m)=-(*((data->htail).uvw+i)+data->UVW[0])* *((data->htail).normal+i)-(*((data->htail).uvw+i+(data->htail).nface)+data->UVW[1])* *((data->htail).normal+i+(data->htail).nface) -
+                (*((data->htail).uvw+i+2*(data->htail).nface)+data->UVW[2])* *((data->htail).normal+i+2*(data->htail).nface);
     }
-    m+=phtail->nface;
-    for (i=0; i < pelevator->nface; i++){
-        *(RHS+i+m)=-(*(pelevator->uvw+i)+UVW[0])* *(pelevator->normal+i)-(*(pelevator->uvw+i+pelevator->nface)+UVW[1])* *(pelevator->normal+i+pelevator->nface) -
-                (*(pelevator->uvw+i+2*pelevator->nface)+UVW[2])* *(pelevator->normal+i+2*pelevator->nface);
+    m+=(data->htail).nface;
+    for (i=0; i < (data->elevator).nface; i++){
+        *((data->RHS)+i+m)=-(*((data->elevator).uvw+i)+data->UVW[0])* *((data->elevator).normal+i)-(*((data->elevator).uvw+i+(data->elevator).nface)+data->UVW[1])* *((data->elevator).normal+i+(data->elevator).nface) -
+                (*((data->elevator).uvw+i+2*(data->elevator).nface)+data->UVW[2])* *((data->elevator).normal+i+2*(data->elevator).nface);
     }
-    m+=pelevator->nface;
-    for (i=0; i < pvtail->nface; i++){
-        *(RHS+i+m)=-(*(pvtail->uvw+i)+UVW[0])* *(pvtail->normal+i)-(*(pvtail->uvw+i+pvtail->nface)+UVW[1])* *(pvtail->normal+i+pvtail->nface) -
-                (*(pvtail->uvw+i+2*pvtail->nface)+UVW[2])* *(pvtail->normal+i+2*pvtail->nface);
+    m+=(data->elevator).nface;
+    for (i=0; i < (data->vtail).nface; i++){
+        *((data->RHS)+i+m)=-(*((data->vtail).uvw+i)+data->UVW[0])* *((data->vtail).normal+i)-(*((data->vtail).uvw+i+(data->vtail).nface)+data->UVW[1])* *((data->vtail).normal+i+(data->vtail).nface) -
+                (*((data->vtail).uvw+i+2*(data->vtail).nface)+data->UVW[2])* *((data->vtail).normal+i+2*(data->vtail).nface);
     }
-    m+=pvtail->nface;
-    for (i=0; i < prudder->nface; i++){
-        *(RHS+i+m)=-(*(prudder->uvw+i)+UVW[0])* *(prudder->normal+i)-(*(prudder->uvw+i+prudder->nface)+UVW[1])* *(prudder->normal+i+prudder->nface) -
-                (*(prudder->uvw+i+2*prudder->nface)+UVW[2])* *(prudder->normal+i+2*prudder->nface);
+    m+=(data->vtail).nface;
+    for (i=0; i < (data->rudder).nface; i++){
+        *((data->RHS)+i+m)=-(*((data->rudder).uvw+i)+data->UVW[0])* *((data->rudder).normal+i)-(*((data->rudder).uvw+i+(data->rudder).nface)+data->UVW[1])* *((data->rudder).normal+i+(data->rudder).nface) -
+                (*((data->rudder).uvw+i+2*(data->rudder).nface)+data->UVW[2])* *((data->rudder).normal+i+2*(data->rudder).nface);
     }
 }

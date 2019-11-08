@@ -10,7 +10,8 @@
 #define vLiftsurf_h
 
 #include <stdio.h>
-struct liftsurf{
+struct liftsurf
+{
     int    nface; /* number of panels */
     int    nvert; /* number of vertices */
     int *faces; /* panel definitions */
@@ -45,6 +46,7 @@ struct liftsurf{
     double *vw; /* velocity in y-direction of wake vertices */
     double *ww; /* velocity in z-direction of wake vertices */
     double *gw; /* Vortex strength on each wake panel */
+    double dxw; // Distance to collocation point
 };
 
 #endif /* vLiftsurf_h */

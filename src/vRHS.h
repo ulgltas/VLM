@@ -8,8 +8,9 @@
 #define vRHS_h
 
 #include "vLiftsurf.h"
+#include "vVLMData.h"
 
-void calcRHS(struct liftsurf *pwing, struct liftsurf *pflap, struct liftsurf *paileron, struct liftsurf *phtail, struct liftsurf *pelevator, struct liftsurf *pvtail, struct liftsurf *prudder, double *RHS, double UVW[]);
+void calcRHS(struct VLMData *data);
 
 
 #endif /* vRHS_h */

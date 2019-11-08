@@ -17,18 +17,18 @@
 #include <string.h>
 #include <stdlib.h>
 
-void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfile, int m, int n)
+void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfile, int m, int n, int *ChkRdr)
 {
     /* Set up vertical tail */
     
     double pi;
-    int i,j,k,nylim,mxlim,nxpos,nypos,nxyzTS;
+    int i,j,nxpos,nypos,nxyzTS;
     int mp1,np1;
     int vtailhere,rudderhere;
     int vtail_nvert,rudder_nvert,vtail_nface,rudder_nface;
     
-    double *ypos,*xpos,RDRypos[2],*ylim,*xlim;
-    double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,twistcentre,*ycamber,*ycamberall,*ycamberwgl;
+    double *ypos,*xpos;
+    double *ypline,*xpline,*xpgrid,*ypgrid,*zpgrid,yhere,*xTS,*yTS,*yTS2,*zTS,*ycamber,*ycamberall;
     double *xv,*yv,*zv,dxw,minchord;
     double *xvtail,*yvtail,*zvtail,*xrudder,*yrudder,*zrudder,*chordvec,*levec;
     double *xvvtail,*yvvtail,*zvvtail,*xvrudder,*yvrudder,*zvrudder;
@@ -36,15 +36,14 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     int *ijvtail, *ijrudder;
 
     FILE *fp1;
-    int iTS, VTTSNumber, cond, ChkRdr, npTS, npTSp1, ndouble;
+    int iTS, VTTSNumber, cond, ndouble;
     int RDRinds[2][2],dummyint,OptVTFusMounted,OptVTTailMounted,OptVTWingMounted;
-    char line[110], code[8], VTType[12], VTArf[12], VTSurfFinish[12], nindex[12];
+    char line[110], code[8], VTType[12], VTArf[12], VTSurfFinish[12];
     double VTTSLength[2], VTTSRtChord[2], VTTSTpChord[2];
     double VTTSSwpLE[2], VTTSDhdr[2], VTTSTR[2];
-    double VTSpan, VTLPosFus, VTVPosFus, VTRtChord, VTTpChord, VTSPosFus, VTArea, VTTankVol, VTSwpLE, VTVAngle;
+    double VTSpan, VTLPosFus, VTVPosFus, VTRtChord, VTTpChord, VTSPosFus, VTArea, VTSwpLE, VTVAngle;
     double VTAR, VTTR, VTVolCoeff,VTRlTpChord,VTRlPosFus,VTRlVPosHT;
-    double VTArea_Vs_WngArea,VTRlVPosWng;
-    double RdrSpan, RdrPosSpan, RdrGearRatio, RdrArea, RdrHingeLoc,RdrRlChord,RdrRlSpan;
+    double RdrSpan, RdrPosSpan, RdrArea, RdrHingeLoc,RdrRlChord,RdrRlSpan;
     double RdrMxDDflct, RdrMxUDflct, RdrRtChord, RdrTpChord, RdrSMC;
 
     /* Read VTail.arp and extract vertical tail description */
@@ -129,14 +128,14 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
             sscanf(line,"%s %lf %lf %lf %lf %lf %lf",code,&VTAR,&VTTR,&VTVolCoeff,&VTRlTpChord,&VTRlPosFus,&VTRlVPosHT);
         }
         if ( strncmp("RDR201",line,6) == 0 ){
-            sscanf(line,"%s %i",code,&ChkRdr);
+            sscanf(line,"%s %i",code, ChkRdr);
             cond=1;
         }
     }
     cond=0;
     while(cond == 0){
         fgets(line, 110, fp1);
-        if ( ChkRdr == 1 ){
+        if ( *ChkRdr == 1 ){
             if ( strncmp("RDR601",line,6) == 0 ){
                 sscanf(line,"%s %lf %lf",code,&RdrSpan,&RdrPosSpan);
             }
@@ -168,8 +167,14 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
         }
     } 
     
-    nypos=VTTSNumber+3;
-    nxpos=3;
+    nypos=VTTSNumber+1;
+    nxpos=2;
+    if (*ChkRdr == 1)
+    {
+        nypos += 2;
+        nxpos++;
+    }
+
     nxyzTS=VTTSNumber+1;
     /* Create vector containing y-coords of TS and Rdr */
     ypos= (double *)malloc(sizeof(double)*nypos); 
@@ -185,8 +190,12 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
         *(xTS+i)=VTTSLength[i-1]*tan(VTTSSwpLE[i-1])+*(xTS+i-1);
         *(zTS+i)=sin(pi/2.0-VTTSDhdr[i-1])*VTTSLength[i-1]+*(zTS+i-1);
     }
-    *(ypos+i)=RdrPosSpan;i++;
-    *(ypos+i)=RdrSpan+RdrPosSpan;
+    if (*ChkRdr == 1)
+    {
+        *(ypos+i)=RdrPosSpan;
+        i++;
+        *(ypos+i)=RdrSpan+RdrPosSpan;
+    }
     
     /* Sort ypos vector */
     qsort(ypos, nypos, sizeof(double), compare_function);
@@ -209,10 +218,16 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     RDRinds[1][1]=findindex(ypline,np1,RdrSpan+RdrPosSpan); 
     
     /* Create vector containing x-coords of TS and Rdr */
-    xpos= (double *)malloc(sizeof(double)*nxpos); 
+    xpos = (double *)malloc(sizeof(double)*nxpos);
     *(xpos+0)=0.0;
-    *(xpos+1)=(100.0-RdrRlChord)/100.0;
-    *(xpos+2)=1.0;
+    i = 1;
+    if (*ChkRdr == 1)
+    {
+        *(xpos+i)=(100.0-RdrRlChord)/100.0;
+        i++; 
+    }
+    *(xpos+i)=1.0;
+    
     /* Sort xpos vector */
     qsort(xpos, nxpos, sizeof(double), compare_function);
     /* Remove repeated values from xpos vector */   
@@ -230,6 +245,8 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     }
     /* Create vector containing the full spanwise grid */
     createypline(xpos,nxpos,xpline,mp1);
+    free(ypos);
+    free(xpos);
     /* Check between which elements of xpline lies the elevator */
     RDRinds[0][0]=findindex(xpline,mp1,(100.0-RdrRlChord)/100.0);
     RDRinds[1][0]=m; /* Will always lie on the trailing edge */ 
@@ -278,8 +295,12 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
             zplineTp=*(ycamberall+i+(2*iTS+1)*mp1)*VTTSTpChord[iTS]; /* Tip camber line of trapezoidal section */
             *(zpgrid+i+j*mp1)=(zplineTp-zplineRt)/VTTSLength[iTS]*(yhere-*(yTS+iTS))+zplineRt;
         }
-    } 
-
+    }
+    free(xpline);
+    free(ycamberall);
+    free(chordvec);
+    free(levec);
+    free(ycamber);
     /* wake shedding distance */
     dxw=0.3*minchord/m;
     vortexpanel(xv,yv,zv,xpgrid,ypgrid,zpgrid,dxw,m,n);  
@@ -315,7 +336,7 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
             vtailhere=0;
             rudderhere=0;
             /* Check if this point lies on the rudder */
-            if (i >= RDRinds[0][0] && i <= RDRinds[1][0] && j >= RDRinds[0][1] && j <= RDRinds[1][1]){ /* Elevator */
+            if (*ChkRdr==1 && i >= RDRinds[0][0] && i <= RDRinds[1][0] && j >= RDRinds[0][1] && j <= RDRinds[1][1]){ /* Elevator */
                 rudderhere=1;
                 if (i == RDRinds[0][0]){ /* Rudder leading edge */
                     vtailhere=1;
@@ -373,8 +394,18 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
                 *(ijvtail+mp1*np1+vtail_nvert-1)=j;
             }
         }
-    }     
-    
+    }
+    free(ypline);
+    free(xv);
+    free(yv);
+    free(zv);
+    free(xpgrid);
+    free(ypgrid);
+    free(zpgrid);
+    free(xTS);
+    free(yTS);
+    free(yTS2);
+    free(zTS);
     /* Count number of panels on all halves of lifting surfaces */
     rudder_nface=countfaces(ijrudder,rudder_nvert,mp1,np1);
     vtail_nface=countfaces(ijvtail,vtail_nvert,mp1,np1);   
@@ -385,15 +416,27 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     prudder->faces=(int *)malloc(sizeof(int)*prudder->nface*4); 
     prudder->shedding=(int *)malloc(sizeof(int)*prudder->nface); 
     arrangefaces(ijrudder,mp1,np1,prudder);  
-    
+    free(ijrudder);
     /* Create all the panel information in the vtail liftsurf structure */
     pvtail->nface=2*vtail_nface;
     pvtail->nvert=2*vtail_nvert;
     pvtail->faces=(int *)malloc(sizeof(int)*pvtail->nface*4); 
     pvtail->shedding=(int *)malloc(sizeof(int)*pvtail->nface); 
     arrangefaces(ijvtail,mp1,np1,pvtail);
-
+    free(ijvtail);
     /* Copy all panel vertex information to the relevant liftsurf structures */
     assignvertices_fin(prudder,xrudder,yrudder,zrudder,xvrudder,yvrudder,zvrudder,OptVTFusMounted,OptVTTailMounted,OptVTWingMounted);
+    free(xrudder);
+    free(yrudder);
+    free(zrudder);
+    free(xvrudder);
+    free(yvrudder);
+    free(zvrudder);
     assignvertices_fin(pvtail,xvtail,yvtail,zvtail,xvvtail,yvvtail,zvvtail,OptVTFusMounted,OptVTTailMounted,OptVTWingMounted);
+    free(xvtail);
+    free(yvtail);
+    free(zvtail);
+    free(xvvtail);
+    free(yvvtail);
+    free(zvvtail);
 }

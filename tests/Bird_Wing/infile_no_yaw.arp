@@ -11,8 +11,8 @@ INP4    25  2.0   1
 % Aileron angle in degrees, flap angle in degrees, elevator angle in degrees, rudder angle in degrees
 INP5    0.0   0.0   0.0   0.0
 % Wing geometry file
-INP6    ./tests/Bird_Wing/Wing-4Sct.arp
+INP6    ./tests/Bird_Wing/models/Wing-4Sct.arp
 % Horizontal tail geometry file
-INP7    ./tests/Bird_Wing/HTail.arp
+INP7    ./tests/Bird_Wing/models/HTail.arp
 % Vertical tail geometry file
-INP8    ./tests/Bird_Wing/VTail.arp
+INP8    ./tests/Bird_Wing/models/VTail.arp
