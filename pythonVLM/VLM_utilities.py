@@ -7,7 +7,8 @@ def create_workspace(name, origin):
 
     temp_dir = os.path.join(os.path.split(__file__)[0], "..")
     vlm_dir = os.path.abspath(temp_dir)
-    workspace = os.path.join(vlm_dir, "workspace", name)
+    work_dir = origin.replace(os.sep, "_")
+    workspace = os.path.join(vlm_dir, "workspace", work_dir)
     origin_models = os.path.join(vlm_dir, origin, "models")
     models = os.path.join(workspace, "models")
     if not os.path.exists(models):

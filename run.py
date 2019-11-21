@@ -26,7 +26,7 @@ def main():
 
     
 
-    filename = os.path.join(vlm_dir, "tests", name, filename)
+    filename = os.path.join(vlm_dir, origin, filename)
     if os.path.isfile(filename):
         print("Executing file {}".format(filename))
         execfile(filename, globals(), locals())
