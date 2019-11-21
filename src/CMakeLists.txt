@@ -5,7 +5,7 @@
 # Authors : M. SANCHEZ MARTINEZ.
 
 FILE(GLOB SRCS *.h *.c) # Stores these files in variable SRCS
-FILE(GLOB SWIGSRCS *.i)
+SET(SWIGSRCS VLM_ADS.i)
 
 
 ADD_LIBRARY(VLMCore STATIC ${SRCS})
