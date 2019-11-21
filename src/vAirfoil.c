@@ -120,7 +120,7 @@ void interparf(double *ycamber, double *ArfXU, double *ArfYU, double *ArfXL, dou
     for (i=0;i<mp1;i++){
         j=0;
         /* Upper surface interpolation */
-        while (*(ArfXU+j)/100.0 <= *(xpline+i) && j <= ArfXUNumber[0]-1){
+        while (*(ArfXU+j)/100.0 <= *(xpline+i) && j < ArfXUNumber[0]-1){ // Avoid going out of bounds of ArfXU/ArfYU
             j++;
         }
         slope=(*(ArfYU+j)- *(ArfYU+j-1))/(*(ArfXU+j)- *(ArfXU+j-1));
@@ -129,7 +129,7 @@ void interparf(double *ycamber, double *ArfXU, double *ArfYU, double *ArfXL, dou
         
         /* Lower surface interpolation */
         j=0;
-        while (*(ArfXL+j)/100.0 <= *(xpline+i) && j <= ArfXLNumber[0]-1){
+        while (*(ArfXL+j)/100.0 <= *(xpline+i) && j < ArfXLNumber[0]-1){ // Avoid going out of bounds of ArfXL/ArfYL
             j++;
         }
         slope=(*(ArfYL+j)- *(ArfYL+j-1))/(*(ArfXL+j)- *(ArfXL+j-1));
