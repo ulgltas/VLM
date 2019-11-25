@@ -1,3 +1,19 @@
+/**
+ * Copyright 2019 Université de Liège
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 //
 //  vAirfoil.c
 //  
@@ -120,7 +136,7 @@ void interparf(double *ycamber, double *ArfXU, double *ArfYU, double *ArfXL, dou
     for (i=0;i<mp1;i++){
         j=0;
         /* Upper surface interpolation */
-        while (*(ArfXU+j)/100.0 <= *(xpline+i) && j <= ArfXUNumber[0]-1){
+        while (*(ArfXU+j)/100.0 <= *(xpline+i) && j < ArfXUNumber[0]-1){ // Avoid going out of bounds of ArfXU/ArfYU
             j++;
         }
         slope=(*(ArfYU+j)- *(ArfYU+j-1))/(*(ArfXU+j)- *(ArfXU+j-1));
@@ -129,7 +145,7 @@ void interparf(double *ycamber, double *ArfXU, double *ArfYU, double *ArfXL, dou
         
         /* Lower surface interpolation */
         j=0;
-        while (*(ArfXL+j)/100.0 <= *(xpline+i) && j <= ArfXLNumber[0]-1){
+        while (*(ArfXL+j)/100.0 <= *(xpline+i) && j < ArfXLNumber[0]-1){ // Avoid going out of bounds of ArfXL/ArfYL
             j++;
         }
         slope=(*(ArfYL+j)- *(ArfYL+j-1))/(*(ArfXL+j)- *(ArfXL+j-1));

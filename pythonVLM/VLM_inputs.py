@@ -1,5 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
+# Copyright 2019 Université de Liège
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import wing
 import CVLM
@@ -105,14 +118,25 @@ class VLMSurface(wing.Wing):
                     f.close()
                 elif os.path.isfile(fname) and not os.path.isfile(fname_arf):
                     data = self.read(fname)
+                    if data[0, 0] == 1.0 and not data[-1, 0] == 1.0:
+                        data = np.concatenate((data, [data[0,:]]))
                     n = len(data)
-                    l_data = (n+1)/2
+                    leading_edge = np.argmin(data, 0)[0] # Where in the file is the leading edge?
+                    dc = data[leading_edge, 0]
+                    c = 1 - dc
+                    suction_side = data[range(leading_edge+1), :]
+                    pressure_side = data[range(leading_edge, n), :]
+                    l_data = max([len(suction_side), len(pressure_side)])
                     f = open(fname_arf, "w")
-                    f.write("GMD401 {}\n".format(l_data))
-                    f.write("GMD402 {}\n".format(l_data))
+                    f.write("GMD401 {}\n".format(len(suction_side)))
+                    f.write("GMD402 {}".format(len(pressure_side)))
                     for i in range(l_data):
-                        f.write("GM15 {} {} {} {}\n".format(data[l_data-i-1,0]*100, data[l_data-i-1,1]*100, data[l_data+i-1,0]*100, data[l_data+i-1,1]*100))
-                    f.write("GMD6 \n")
+                        f.write("\nGM15")
+                        if i < len(suction_side):
+                            f.write(" {} {}".format((suction_side[-1-i,0]-dc)/c*100, suction_side[-1-i,1]*100))
+                        if i < len(pressure_side):
+                            f.write(" {} {}".format((pressure_side[i,0]-dc)/c*100, pressure_side[i,1]*100))
+                    f.write("\nGMD6 \n")
                     f.close()
                 elif not os.path.isfile(fname) and not os.path.isfile(fname_arf):
                     raise Exception("Neither arf nor dat file found for airfoil {}".format(airfoil))
