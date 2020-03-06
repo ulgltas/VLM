@@ -50,7 +50,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     int *ijwing, *ijflap, *ijaileron;
        
     FILE *fp1;
-    int iTS, lstWngTSNumber, cond, ChkWLED, ChkWGL, WTEDStopPointsNumber, ndouble;
+    int iTS, lstWngTSNumber, cond, ChkWLED, ChkWGL, ndouble;
     int Ailinds[2][2],WTEDinds[2][2],Wglinds[2][2];
     char line[110], code[8], WngArf[12], nindex[12];
     double WngTSLength[4], WngTSRtChord[4], WngTSTpChord[4], WngTSLPosFus[4], WngTSSPosFus[4], WngTSVPosFus[4];
@@ -62,7 +62,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     double AilMxDDflct, AilMxUDflct, AilDDflct, AilLocSpan, AilArea_Vs_WngArea, AilSpan_Vs_WngSpan;
     double WLEDSpan, WLEDPosSpan, WLEDMxExtdChord, WLEDLocSpan, WLEDRlSpan, WLEDRlChord, WLEDSpan_Vs_WngSpan;
     double WTEDSpan, WTEDPosSpan, WTEDHingeRlPos, WTEDRlChord, WTEDRlSpan, WTEDMxDDflct, WTEDMxUDflct, WTEDLocSpan, WTEDMxExtdChord;
-    double WTEDSpan_Vs_WngSpan, *WTEDStopPoint;
+    double WTEDSpan_Vs_WngSpan;
     double WglSpan,WglRtChord,WglTpChord,WglArea,WglSwpLE,WglDhdrl,WglLeOffset,WglTpr;
     
     /* Read Wing.arp and extract wing description */
@@ -293,23 +293,11 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
             if ( strncmp("TED608",line,6) == 0 ){
                 sscanf(line,"%s %lf",code,&WTEDSpan_Vs_WngSpan);
             }
-            if ( strncmp("TED611",line,6) == 0 ){
-                sscanf(line,"%s %i",code,&WTEDStopPointsNumber);
-                WTEDStopPoint = (double *)malloc(sizeof(double)*WTEDStopPointsNumber);
-                fscanf(fp1,"%s",code);
-                for (i=0;i<WTEDStopPointsNumber;i++){
-                    fscanf(fp1,"%lf",(WTEDStopPoint+i));
-                }
             }
-        }
         if ( strncmp("WGL201",line,6) == 0 ){
             sscanf(line,"%s %i",code,&ChkWGL);
             cond=1;
         }        
-    }
-    if (*ChkWTED == 1)
-    {
-        free(WTEDStopPoint);
     }
     if (*ChkWTED == 0)
     {
