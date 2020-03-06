@@ -346,7 +346,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
         WglLeOffset=0.01;
         WglSwpLE=WglSwpLE*pi/180.0;
         WglDhdrl=WglDhdrl*pi/180.0;
-        nypos+=3; // Three panels in the winglet
+        nypos+=1;
         nxpos+=2;
         nxyzTS=lstWngTSNumber+2;
         WglTpr=WglTpChord/WglRtChord; /* Winglet taper ratio */
@@ -380,7 +380,7 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     if (  ChkWGL == 1){
         *(ypos+i)=*(yTS+lstWngTSNumber)+WglSpan;
         *(yTS+lstWngTSNumber+1)=*(ypos+i);
-        *(yTS2+lstWngTSNumber+1)=WglSpan*cos(WngTSDhdr[i-1])+*(yTS2+lstWngTSNumber);
+        *(yTS2+lstWngTSNumber+1)=WglSpan*cos(WngTSDhdr[lstWngTSNumber-1])+*(yTS2+lstWngTSNumber);
         *(xTS+lstWngTSNumber+1)=WglSpan*tan(WglSwpLE)+*(xTS+lstWngTSNumber);
         *(zTS+lstWngTSNumber+1)=WglSpan*sin(WglDhdrl)+*(zTS+lstWngTSNumber);
     }                
