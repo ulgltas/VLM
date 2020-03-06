@@ -333,12 +333,12 @@ double wingsetup(struct liftsurf *pflap, struct liftsurf *paileron, struct lifts
     nxyzTS=lstWngTSNumber+1;
     if (*ChkAil == 1)
     {
-        nypos++;
+        nypos += 2;
         nxpos++;
     }
     if (*ChkWTED == 1)
     {
-        nypos++;
+        nypos += 2;
         nxpos++;
     }
 
