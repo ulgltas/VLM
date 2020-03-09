@@ -223,8 +223,12 @@ class VLMSurface(wing.Wing):
             f.write("{}{}501:\t{}\t{}\n".format(kind_short, i+1, self.airfoils[i], self.airfoils[i+1]))
             f.write("{}{}502:\t{}\t{}\t{}\n".format(
                 kind_short, i+1, dy, self.chord[i], self.chord[i+1]))
-            f.write("{}{}503:\t{}\t{}\t{}\t{}\t{}\n".format(
-                kind_short, i+1, np.rad2deg(self.twist[i]), np.rad2deg(self.twist[i+1]), np.rad2deg(self.sweep_le[i]), np.rad2deg(self.dihedral[i]), np.rad2deg(self.twist[i])))
+            if self.kind=="VTL":
+                f.write("{}{}503:\t{}\t{}\n".format(
+                    kind_short, i+1, np.rad2deg(self.sweep_le[i]), np.rad2deg(self.dihedral[i])))
+            else:
+                f.write("{}{}503:\t{}\t{}\t{}\t{}\t{}\n".format(
+                    kind_short, i+1, np.rad2deg(self.twist[i]), np.rad2deg(self.twist[i+1]), np.rad2deg(self.sweep_le[i]), np.rad2deg(self.dihedral[i]), np.rad2deg(self.twist[i])))
             f.write("{}{}504: \n".format(kind_short, i+1))
             f.write("{}{}505: \n".format(kind_short, i+1))
             f.write("{}{}601: \n".format(kind_short, i+1))
