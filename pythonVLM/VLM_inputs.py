@@ -16,6 +16,7 @@
 
 import wing
 import CVLM
+import warnings
 
 ## Describe properties of a VLM calculation
 class VLMProperties:
@@ -315,8 +316,11 @@ class VLMControl:
         self.exists = 1
         self.span = span
         self.root = root
-        self.rel_chord = chord/wing.get_chord(root)*100.0
         self.rel_span = self.span/wing.b*100.0
+        if chord>=wing.get_chord(root):
+            chord = 0.99*wing.get_chord(root)
+            warnings.warn("Control surface chord is too large. Reducing to 0.99 times the root chord.")
+        self.rel_chord = chord/wing.get_chord(root)*100.0
 
 class VLMWinglet:
     kind = "WGL"
