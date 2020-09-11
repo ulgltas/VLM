@@ -125,8 +125,8 @@ class VLMSurface(wing.Wing):
                     leading_edge = np.argmin(data, 0)[0] # Where in the file is the leading edge?
                     dc = data[leading_edge, 0]
                     c = 1 - dc
-                    suction_side = data[range(leading_edge+1), :]
-                    pressure_side = data[range(leading_edge, n), :]
+                    suction_side = data[list(range(leading_edge+1)), :]
+                    pressure_side = data[list(range(leading_edge, n)), :]
                     l_data = max([len(suction_side), len(pressure_side)])
                     f = open(fname_arf, "w")
                     f.write("GMD401 {}\n".format(len(suction_side)))
@@ -141,7 +141,7 @@ class VLMSurface(wing.Wing):
                     f.close()
                 elif not os.path.isfile(fname) and not os.path.isfile(fname_arf):
                     raise Exception("Neither arf nor dat file found for airfoil {}".format(airfoil))
-        filenames = map("models/{}".format, filenames)
+        filenames = list(map("models/{}".format, filenames))
         wing.Wing.initData(self, filenames, span, twist, sweep, dihedral, offset)
         self.y_offset = self.spanPos
         for j in range(1,self.n):
@@ -343,4 +343,4 @@ class VLMWinglet:
 
 def isNACA4or5(airfoil):
     import re
-    return re.match("NACA ?(?P<number>\d{4,5})\D*", airfoil)
+    return re.match(r"NACA ?(?P<number>\d{4,5})\D*", airfoil)

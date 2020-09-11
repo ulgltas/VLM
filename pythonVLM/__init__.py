@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import VLM_utilities
+from . import VLM_utilities
 VLM_utilities.add_path("geoGen")
 VLM_utilities.add_path("VLM/bin")
-import VLM_inputs
-import VLM_testing
-import VLM_driver
+from . import VLM_inputs
+from . import VLM_testing
+from . import VLM_driver

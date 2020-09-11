@@ -37,7 +37,7 @@ def add_path(name):
     vlm_dir = os.path.abspath(os.path.split(__file__)[0])
     path = os.path.join(vlm_dir, "..", "..", name)
     if os.path.isdir(path):
-         print("INFO: adding {} to PYTHONPATH".format(path))
+         print(("INFO: adding {} to PYTHONPATH".format(path)))
          sys.path.append(path)
     else:
-        print("INFO: {} not found!".format(path))
+        print(("INFO: {} not found!".format(path)))
