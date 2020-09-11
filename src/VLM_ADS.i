@@ -81,7 +81,7 @@ import_array();
 %apply (double IN_ARRAY1[ANY]) {(double delta[2])}
 
 %typemap(in, numinputs = 1) char* Infile {
-  $1 = PyString_AsString($input);
+  $1 = PyUnicode_AsUTF8($input);
 }
 %typemap(in) (struct VLMData *data) (int temp) {
   temp = SWIG_ConvertPtr($input, (void **) &$1, $1_descriptor , 0);
