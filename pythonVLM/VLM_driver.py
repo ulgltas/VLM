@@ -22,7 +22,7 @@ class VLMDriver(object):
         self.data = CVLM.VLMData()
         CVLM.setup(infile, self.data)
         self.m = self.data.wing.nshed+2 # Assumes only wing
-        self.n = self.data.wing.nvert/self.m
+        self.n = int(self.data.wing.nvert/self.m)
         CVLM.geometry_setup(self.data)
         CVLM.cycleliftsurf(self.data)
         CVLM.memory_setup(self.data)
