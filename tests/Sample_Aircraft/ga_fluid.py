@@ -121,7 +121,7 @@ vtail.rudder.angle = 10.0
 
 # --- Flow properties ---
 properties = inputs.VLMProperties(wing, htail, vtail)
-properties.u = 50
+properties.u = 50.
 properties.rho = 1.225
 properties.AoA = 2.0
 properties.yaw = 0.0
@@ -142,7 +142,7 @@ VLM.save()
 
 # --- Test loads ---
 
-references = [616.497859, -803.381703, 13038.832337, 655.011561]
-tolerances = [0.01, 0.0001, 0.1, 0.01]
+references = [616., -803., 13000, 655.] # Fx, Fy, Fz, Induced drag
+tolerances = [6., 8., 100., 7.]
 
 tests.test("outfile.py", properties.timesteps, references, tolerances)
