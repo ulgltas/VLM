@@ -46,6 +46,7 @@ git clone https://github.com/acrovato/geoGen # should be located next to VLM
 Windows does not feature a package manager by default. You will need to install or compile all the dependencies by yourself. Please refer to the documention of each package. Note however that CMake is usually bundled with Visual Studio 2017 and later.  
 Yet another option is to use [MSYS2](https://www.msys2.org/) which provides a Linux-like environment. MSYS2 comes with the package manager pacman.
 ```bash
+pacman -S git
 pacman -S make
 pacman -S mingw-w64-x86_64-tools-git
 pacman -S mingw-w64-x86_64-cmake
