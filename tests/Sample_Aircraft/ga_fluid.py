@@ -18,6 +18,7 @@
 
 import pythonVLM.VLM_inputs as inputs
 import pythonVLM.VLM_driver as driver
+import pythonVLM.VLM_testing as tests
 
 # --- Wing ---
 root_chord_w = 2.0
@@ -138,3 +139,10 @@ properties.write_infile()
 VLM = driver.VLMDriver(properties.infile)
 VLM.run()
 VLM.save()
+
+# --- Test loads ---
+
+references = [616.497859, -803.381703, 13038.832337, 655.011561]
+tolerances = [0.01, 0.0001, 0.1, 0.01]
+
+tests.test("outfile.py", properties.timesteps, references, tolerances)
