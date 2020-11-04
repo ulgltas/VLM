@@ -97,6 +97,6 @@ bin/VLM path/to/input/file
 ```
 If using the Python wrapper
 ```bash
-python run.py path/to/input/file
+python3 run.py path/to/input/file
 ```
 This will automatically create its own workspace folder.

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf8 -*-
 # Copyright 2020 Université de Liège
 # 
