@@ -1,72 +1,102 @@
 # VLM
-This **V**ortex **L**attice **M**ethod code is a 3D unsteady aerodynamics solver.
-# Code compilation procedure
-The code requires CMake and a C compiler. It works with `gcc`, `msvc` and `clang`. For the python wrapper, geoGen, SWIG, Python 3 and NumPy are required as well.
+This **V**ortex **L**attice **M**ethod code is a 3D unsteady aerodynamics solver relying on potential flow theory.
 
-geoGen can be obtained from [this repository](https://github.com/acrovato/geoGen), currently it should be in a folder in the same folder as the VLM one.
+[![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](LICENSE)
 
-## Aptitude-based linux systems (Debian, Ubuntu)
+![](pics/title.png)
+
+## Building and testing
+### Dependencies
+The code requires:
+- [CMake](https://cmake.org/)
+- a C compiler ([GCC](https://gcc.gnu.org/), MSVC and [Clang](https://clang.llvm.org/) are supported)
+
+Additionally, the code is wrapped in python. For the wrapper to be enabled, the code following dependencies are also required:
+- [SWIG](http://www.swig.org/)
+- [Python 3](https://www.python.org/)
+- [NumPy](https://numpy.org/)
+- [geoGen](https://github.com/acrovato/geoGen)
+Note that geoGen should be located in a folder next to VLM.
+
+#### Aptitude-based linux systems (Debian, Ubuntu)
+Dependencies under Linux can be resolved by the Aptitude package manager.
 ```bash
+sudo apt-get install git
 sudo apt-get install cmake
-```
-### Python wrapper
-```bash
+# additional dependencies for python wrapper
 sudo apt-get install python3 python3-dev libpython3-dev
-sudo apt-get install python3-numpy python3-scipy
+sudo apt-get install python3-numpy
 sudo apt-get install swig
+git clone https://github.com/acrovato/geoGen # should be located next to VLM
 ```
 
-## OS X
-You need both XCode and having the CMake Command Line Interface. The latter can be installed with Homebrew:
+#### OS X
+Dependencies under MacOS can be resolved by the Homebrew package manager.
 ```bash
+brew install git
 brew install cmake
-```
-
-### Python wrapper
-Python 3 can be unavailable in OS X environments. Homebrew is recommended.
-```bash
+# additional dependencies for python wrapper
 brew install python
-brew install numpy scipy
+brew install numpy
 brew install swig
+git clone https://github.com/acrovato/geoGen # should be located next to VLM
 ```
 
-## Windows
-Using Visual Studio 2017, code compiling **without the Python wrapper** is relatively straightforward. CMake is included by default. Make sure to disable the Python wrapper before running CMake, with option `-DPYTHON_WRAPPER=OFF`.
-For both versions, tests can be run from the CMake menu.
+#### Windows
+Windows does not feature a package manager by default. You will need to install or compile all the dependencies by yourself. Please refer to the documention of each package. Note however that CMake is usually bundled with Visual Studio 2017 and later.  
+Yet another option is to use [MSYS2](https://www.msys2.org/) which provides a Linux-like environment. MSYS2 comes with the package manager pacman.
+```bash
+pacman -S make
+pacman -S mingw-w64-x86_64-tools-git
+pacman -S mingw-w64-x86_64-cmake
+pacman -S mingw-w64-x86_64-gcc
+# additional dependencies for python wrapper
+pacman -S mingw-w64-x86_64-swig
+pacman -S mingw-w64-x86_64-python3
+pacman -S mingw-w64-x86_64-python3-numpy
+git clone https://github.com/acrovato/geoGen # should be located next to VLM
+```
 
-### Python wrapper
-You need:
-1. A working Python installation with NumPy
-2. To download [SWIG](http://www.swig.org/)
-3. To provide CMake with the paths to these programs
-4. To change the configuration to RELEASE
+### Build and test
+The build follows the standard "configure-compile-test" pattern.
+First, get the code using git and enter the directory:
+```
+git clone https://github.com/ulgltas/VLM
+cd VLM
+```
 
-In order to provide the appropriate paths to Swig and Python you can modify the configurations, including in one of them the following line:
+#### Unix(-like) environments
+For native Unix systems (Linux, OSX) simply open a terminal:
+```bash
+mkdir build && cd build
+cmake [-DPYTHON_WRAPPER=OFF] ..
+make
+make install
+ctest
+```
+For MSYS2, open a MSYS2-MINGW64 console:
+```bash
+mkdir build && cd build
+cmake -C ../CMake/msys2.cmake [-DPYTHON_WRAPPER=OFF] ..
+make
+make install
+ctest
+```
+
+#### Native Windows
+Compiling the code **without the Python wrapper** is relatively straightforward. Make sure to disable the Python wrapper before running CMake, with option `-DPYTHON_WRAPPER=OFF`.
+In order to use the wrapper, you also need to change the configuration to RELEASE and to provide CMake with the paths to Python and SWIG. The latter can be done by modifying the configurations:
 ```json
 "cmakeCommandArgs": "-DSWIG_EXECUTABLE=C:\\PATH\\TO\\swig.exe -DPYTHON_EXECUTABLE=C:\\PATH\\TO\\python.exe"
 ```
 
-## Compilation
-
-For Unix-like systems:
-```bash
-mkdir build && cd build
-cmake ..
-make
-make install
-```
-
-By default, the Python wrapper is activated. In order to deactivate it CMake should be run with the corresponding option: `cmake .. -DPYTHON_WRAPPER=OFF`.
-
-# Running and testing
-Once compiled, in the `build` directory, it is possible to run all the tests with `ctest`.
+## Running the code
 By default the program is installed in the `bin` subdirectory and can be called with
 ```bash
 bin/VLM path/to/input/file
 ```
-
 If using the Python wrapper
 ```bash
-python3 run.py path/to/input/file
+python run.py path/to/input/file
 ```
-This will automatically create its own workspace folder. If you are not using the Python wrapper this command will fail.
+This will automatically create its own workspace folder.

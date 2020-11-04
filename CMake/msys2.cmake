@@ -1,4 +1,4 @@
-# Copyright 2019 Université de Liège
+# Copyright 2020 University of Liège
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Add tests
-MACRO_AddTest(${CMAKE_CURRENT_SOURCE_DIR}/Bird_Wing)
-MACRO_AddTest(${CMAKE_CURRENT_SOURCE_DIR}/Flat_Plate)
-MACRO_AddTest(${CMAKE_CURRENT_SOURCE_DIR}/Sample_Aircraft)
-MACRO_AddTest(${CMAKE_CURRENT_SOURCE_DIR}/Selig_Airfoils)
+# MSYS2 with MinGW (AC)
 
+SET(CMAKE_GENERATOR "MSYS Makefiles" CACHE INTERNAL "" FORCE)
