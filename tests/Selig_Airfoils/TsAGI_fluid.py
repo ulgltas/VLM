@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf8 -*-
 # Copyright 2019 Université de Liège
 # 
@@ -93,4 +93,4 @@ VLM = driver.VLMDriver(properties.infile)
 VLM.run()
 VLM.save()
 
-tests.test("outfile.py", properties.timesteps, [-80.623852, 0.000000, 4070.245282, 138.567366], [0.00001, 0.00001, 0.00001, 0.00001])
+tests.test("outfile.py", properties.timesteps, [29.047813, 0.000000, 5286.971696, 213.431801], [0.00001, 0.00001, 0.00001, 0.00001])

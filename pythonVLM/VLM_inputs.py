@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf8 -*-
 # Copyright 2019 Université de Liège
 # 
@@ -16,6 +16,7 @@
 
 import wing
 import CVLM
+import warnings
 
 ## Describe properties of a VLM calculation
 class VLMProperties:
@@ -124,8 +125,8 @@ class VLMSurface(wing.Wing):
                     leading_edge = np.argmin(data, 0)[0] # Where in the file is the leading edge?
                     dc = data[leading_edge, 0]
                     c = 1 - dc
-                    suction_side = data[range(leading_edge+1), :]
-                    pressure_side = data[range(leading_edge, n), :]
+                    suction_side = data[list(range(leading_edge+1)), :]
+                    pressure_side = data[list(range(leading_edge, n)), :]
                     l_data = max([len(suction_side), len(pressure_side)])
                     f = open(fname_arf, "w")
                     f.write("GMD401 {}\n".format(len(suction_side)))
@@ -140,7 +141,7 @@ class VLMSurface(wing.Wing):
                     f.close()
                 elif not os.path.isfile(fname) and not os.path.isfile(fname_arf):
                     raise Exception("Neither arf nor dat file found for airfoil {}".format(airfoil))
-        filenames = map("models/{}".format, filenames)
+        filenames = list(map("models/{}".format, filenames))
         wing.Wing.initData(self, filenames, span, twist, sweep, dihedral, offset)
         self.y_offset = self.spanPos
         for j in range(1,self.n):
@@ -222,8 +223,12 @@ class VLMSurface(wing.Wing):
             f.write("{}{}501:\t{}\t{}\n".format(kind_short, i+1, self.airfoils[i], self.airfoils[i+1]))
             f.write("{}{}502:\t{}\t{}\t{}\n".format(
                 kind_short, i+1, dy, self.chord[i], self.chord[i+1]))
-            f.write("{}{}503:\t{}\t{}\t{}\t{}\t{}\n".format(
-                kind_short, i+1, 0.0, 0.0, np.rad2deg(self.sweep_le[i]), np.rad2deg(self.dihedral[i]), np.rad2deg(self.twist[i])))
+            if self.kind=="VTL":
+                f.write("{}{}503:\t{}\t{}\n".format(
+                    kind_short, i+1, np.rad2deg(self.sweep_le[i]), np.rad2deg(self.dihedral[i])))
+            else:
+                f.write("{}{}503:\t{}\t{}\t{}\t{}\t{}\n".format(
+                    kind_short, i+1, np.rad2deg(self.twist[i]), np.rad2deg(self.twist[i+1]), np.rad2deg(self.sweep_le[i]), np.rad2deg(self.dihedral[i]), np.rad2deg(self.twist[i])))
             f.write("{}{}504: \n".format(kind_short, i+1))
             f.write("{}{}505: \n".format(kind_short, i+1))
             f.write("{}{}601: \n".format(kind_short, i+1))
@@ -315,8 +320,11 @@ class VLMControl:
         self.exists = 1
         self.span = span
         self.root = root
-        self.rel_chord = chord/wing.get_chord(root)*100.0
         self.rel_span = self.span/wing.b*100.0
+        if chord>=wing.get_chord(root):
+            chord = 0.99*wing.get_chord(root)
+            warnings.warn("Control surface chord is too large. Reducing to 0.99 times the root chord.")
+        self.rel_chord = chord/wing.get_chord(root)*100.0
 
 class VLMWinglet:
     kind = "WGL"
@@ -335,4 +343,4 @@ class VLMWinglet:
 
 def isNACA4or5(airfoil):
     import re
-    return re.match("NACA ?(?P<number>\d{4,5})\D*", airfoil)
+    return re.match(r"NACA ?(?P<number>\d{4,5})\D*", airfoil)

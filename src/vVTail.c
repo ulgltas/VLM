@@ -229,9 +229,12 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     }    
     /* Create vector containing the full spanwise grid */
     createypline(ypos,nypos,ypline,np1);
-    /* Check between which elements of ypline lies the elevator */    
-    RDRinds[0][1]=findindex(ypline,np1,RdrPosSpan);
-    RDRinds[1][1]=findindex(ypline,np1,RdrSpan+RdrPosSpan); 
+    /* Check between which elements of ypline lies the elevator */
+    if (*ChkRdr == 1)
+    {
+        RDRinds[0][1]=findindex(ypline,np1,RdrPosSpan);
+        RDRinds[1][1]=findindex(ypline,np1,RdrSpan+RdrPosSpan); 
+    }
     
     /* Create vector containing x-coords of TS and Rdr */
     xpos = (double *)malloc(sizeof(double)*nxpos);
@@ -263,9 +266,12 @@ void vtailsetup(struct liftsurf *pvtail, struct liftsurf *prudder, char *VTailfi
     createypline(xpos,nxpos,xpline,mp1);
     free(ypos);
     free(xpos);
-    /* Check between which elements of xpline lies the elevator */
-    RDRinds[0][0]=findindex(xpline,mp1,(100.0-RdrRlChord)/100.0);
-    RDRinds[1][0]=m; /* Will always lie on the trailing edge */ 
+    /* Check between which elements of xpline lies the rudder */
+    if (*ChkRdr == 1)
+    {
+        RDRinds[0][0]=findindex(xpline,mp1,(100.0-RdrRlChord)/100.0);
+        RDRinds[1][0]=m; /* Will always lie on the trailing edge */ 
+    }
     
     /* Create matrix of non-dimensional camber lines */
     rewind(fp1);

@@ -128,6 +128,11 @@ void setupwakes(struct liftsurf *pwing, int cwing)
     /* Set up number of wakes and wake lengths in liftsurf */
     pwing->nwakes=nwakes-1;
     pwing->wakelengths=(int *)malloc(sizeof(int)*nwakes);
+    if (pwing->nshed == 0) /* If no panels are shed, dummywl and dummywio are size 0 mallocs */
+    {
+        nwakes = 0;
+    }
+    
     /* Store wake lengths */
     for (i=0;i<nwakes;i++){
         *(pwing->wakelengths+i)=*(dummywl+i);

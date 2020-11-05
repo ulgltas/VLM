@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf8 -*-
 # Copyright 2019 Université de Liège
 # 
@@ -36,14 +36,14 @@ def main():
     utils.add_path(os.path.join("VLM", origin))
 
     workspace = utils.create_workspace(name, origin)
-    print("Workspace: {}".format(workspace))
+    print(("Workspace: {}".format(workspace)))
 
     
 
     filename = os.path.join(vlm_dir, origin, filename)
     if os.path.isfile(filename):
-        print("Executing file {}".format(filename))
-        execfile(filename, globals(), locals())
+        print(("Executing file {}".format(filename)))
+        exec(compile(open(filename, "rb").read(), filename, 'exec'), globals(), locals())
     else:
         raise Exception("File not found: {}".format(filename))
 

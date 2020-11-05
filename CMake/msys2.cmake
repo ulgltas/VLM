@@ -1,5 +1,4 @@
-# -*- coding: utf8 -*-
-# Copyright 2019 Université de Liège
+# Copyright 2020 University of Liège
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import VLM_utilities
-VLM_utilities.add_path("geoGen")
-VLM_utilities.add_path("VLM/bin")
-from . import VLM_inputs
-from . import VLM_testing
-from . import VLM_driver
+# MSYS2 with MinGW (AC)
+
+SET(CMAKE_GENERATOR "MSYS Makefiles" CACHE INTERNAL "" FORCE)

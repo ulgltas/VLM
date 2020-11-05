@@ -244,9 +244,12 @@ void htailsetup(struct liftsurf *phtail, struct liftsurf *pelevator, char *HTail
     /* Create vector containing the full spanwise grid */
     createypline(ypos,nypos,ypline,np1);
     free(ypos);
-    /* Check between which elements of ypline lies the elevator */    
-    ELVinds[0][1]=findindex(ypline,np1,ElevPosSpan);
-    ELVinds[1][1]=findindex(ypline,np1,ElevSpan/2+ElevPosSpan);
+    /* Check between which elements of ypline lies the elevator */
+    if (*ChkElev == 1)
+    {
+        ELVinds[0][1]=findindex(ypline,np1,ElevPosSpan);
+        ELVinds[1][1]=findindex(ypline,np1,ElevSpan/2+ElevPosSpan);
+    }
 
     /* Create vector containing x-coords of TS and Elev */
     xpos= (double *)malloc(sizeof(double)*nxpos); 
