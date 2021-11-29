@@ -19,11 +19,11 @@ def create_workspace(name, origin):
     import os
     from distutils import dir_util
 
-    temp_dir = os.path.join(os.path.split(__file__)[0], "..")
-    vlm_dir = os.path.abspath(temp_dir)
-    work_dir = origin.replace(os.sep, "_")
-    workspace = os.path.join(vlm_dir, "workspace", work_dir)
-    origin_models = os.path.join(vlm_dir, origin, "models")
+    cur_dir = os.getcwd()
+    work_dir = name.replace(os.sep, "_")
+    work_dir = work_dir.replace(".", "_")
+    workspace = os.path.join(cur_dir, "workspace", work_dir)
+    origin_models = os.path.join(cur_dir, origin, "models")
     models = os.path.join(workspace, "models")
     if not os.path.exists(models):
         os.makedirs(models)
@@ -32,10 +32,14 @@ def create_workspace(name, origin):
     os.chdir(workspace)
     return workspace
 
-def add_path(name):
+def add_path(name, usecurdir = False):
     import os, sys
-    vlm_dir = os.path.abspath(os.path.split(__file__)[0])
-    path = os.path.join(vlm_dir, "..", "..", name)
+    if usecurdir:   # Uses current path
+        curdir = os.getcwd()
+        path = os.path.join(curdir, name)
+    else:           # Uses relative path from VLM directory
+        vlm_dir = os.path.abspath(os.path.split(__file__)[0])
+        path = os.path.join(vlm_dir, "..", "..", name)
     if os.path.isdir(path):
          print(("INFO: adding {} to PYTHONPATH".format(path)))
          sys.path.append(path)

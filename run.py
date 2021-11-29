@@ -26,21 +26,21 @@ def main():
     args = parser.parse_args()
 
 
-    vlm_dir = os.path.abspath(os.path.split(__file__)[0])
+    orig_dir = os.getcwd()                              # Initial working directory
 
     names = args.file[0].split(os.sep)
-    filename = names[-1]
-    name = names[-2]
-    origin = os.path.split(args.file[0])[0]
+    filename = names[-1]                                # Filename of the test case, usually ending on .py
+    origin = os.path.split(args.file[0])[0]             # Path from the working directory to the file
+    workspace_name = os.path.splitext(args.file[0])[0]  # Workspace name including filename but not .py
 
-    utils.add_path(os.path.join("VLM", origin))
+    utils.add_path(origin, True)
 
-    workspace = utils.create_workspace(name, origin)
+    workspace = utils.create_workspace(workspace_name, origin)
     print(("Workspace: {}".format(workspace)))
 
     
 
-    filename = os.path.join(vlm_dir, origin, filename)
+    filename = os.path.join(orig_dir, origin, filename) # Absolute path to the file
     if os.path.isfile(filename):
         print(("Executing file {}".format(filename)))
         exec(compile(open(filename, "rb").read(), filename, 'exec'), globals(), locals())
